@@ -9,21 +9,23 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.portfolio.portfoliogenerator.model.Education;
-import com.portfolio.portfoliogenerator.service.EducationService;
+import com.portfolio.portfoliogenerator.model.Project;
+import com.portfolio.portfoliogenerator.service.ProjectService;
 
 @RestController
-@RequestMapping("/educationcontroller")
+@RequestMapping("/projectcontroller")
 @CrossOrigin(origins = "*")
-public class EducationController {
-
-	@Autowired
-	EducationService educationService;
+public class ProjectController {
 	
-	@GetMapping("/usereducation/{id}")
-	public List<Education> getEducationByUserId(@PathVariable Long id){
+	@Autowired
+	ProjectService projectService;
+	
+	@GetMapping("/userproject/{id}")
+	public List<Project> getExperienceByUserId(@PathVariable Long id){
+		List<Project> project=projectService.getProjectByUserId(id);
 		
-		return educationService.getEducationByUserId(id);
-		
+		return project;
+	
+
 	}
 }

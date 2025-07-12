@@ -12,11 +12,11 @@ import com.portfolio.portfoliogenerator.repo.EducationRepository;
 public class EducationServiceImpl implements EducationService {
 
 	@Autowired
-	EducationRepository educationrepository;
+	EducationRepository educationRepository;
 
 	public List<Education> getEducationByUserId(Long id){
 		
-		List<Education> userEducation =  educationrepository.findByUser_Id(id);
+		List<Education> userEducation =  educationRepository.findByUser_Id(id);
 		
 		return userEducation;
 	}
