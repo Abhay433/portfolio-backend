@@ -8,13 +8,16 @@ import jakarta.persistence.*;
 public class Education {
 
     @Override
-	public String toString() {
-		return "Education [id=" + id + ", degree=" + degree + ", institution=" + institution + ", startYear="
-				+ startYear + ", endYear=" + endYear + ", user=" + user + ", getId()=" + getId() + ", getDegree()="
-				+ getDegree() + ", getInstitution()=" + getInstitution() + ", getStartYear()=" + getStartYear()
-				+ ", getEndYear()=" + getEndYear() + ", getUser()=" + getUser() + ", getClass()=" + getClass()
-				+ ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
-	}
+    public String toString() {
+        return "Education{" +
+               "id=" + id +
+               ", degree='" + degree + '\'' +
+               ", institution='" + institution + '\'' +
+               ", startYear=" + startYear +
+               ", endYear=" + endYear +
+               '}';
+    }
+
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

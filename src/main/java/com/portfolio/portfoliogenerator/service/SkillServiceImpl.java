@@ -5,23 +5,43 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.portfolio.portfoliogenerator.dto.SkillDto;
 import com.portfolio.portfoliogenerator.model.Skill;
+import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.repo.SkillRepository;
+import com.portfolio.portfoliogenerator.repo.UserRepository;
 
 @Service
 public class SkillServiceImpl implements SkillService{
 	
 	@Autowired
 	SkillRepository skillRepository;
+
+	  @Autowired
+	    private UserRepository userRepository;
+	
+	
 	
 	public List<Skill> getSkillByUserId(Long id){
 		
 		List<Skill> skill=skillRepository.findByUser_id(id);
 		
 		return skill;
-		
-		
-		
 	}
+	
+	@Override
+    public void addSkill(SkillDto skillDto, Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        Skill skill = new Skill();
+        skill.setName(skillDto.getName());
+        skill.setLevel(skillDto.getLevel());
+        skill.setUser(user); // 👈 Set the user
+
+        skillRepository.save(skill);
+    }
+	
+	
 
 }

@@ -1,6 +1,9 @@
 package com.portfolio.portfoliogenerator.dto;
 
+
+
 public class EducationDto {
+	
 	
     private String degree;
     
@@ -34,5 +37,15 @@ public class EducationDto {
 	public void setEndYear(Integer endYear) {
 		this.endYear = endYear;
 	}
+	@Override
+	public String toString() {
+		return "EducationDto [degree=" + degree + ", institution=" + institution + ", startYear=" + startYear
+				+ ", endYear=" + endYear + ", getDegree()=" + getDegree() + ", getInstitution()=" + getInstitution()
+				+ ", getStartYear()=" + getStartYear() + ", getEndYear()=" + getEndYear() + ", getClass()=" + getClass()
+				+ ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
+	}
+	
+
+	
 
 }

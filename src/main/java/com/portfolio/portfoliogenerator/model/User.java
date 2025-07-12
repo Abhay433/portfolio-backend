@@ -9,7 +9,19 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Table(name = "users")
 public class User {
     
-    @Id
+    @Override
+	public String toString() {
+		return "User [id=" + id + ", fullName=" + fullName + ", email=" + email + ", phone=" + phone + ", aboutMe="
+				+ aboutMe + ", address=" + address + ", educations=" + educations + ", experiences=" + experiences
+				+ ", skills=" + skills + ", projects=" + projects + ", getId()=" + getId() + ", getFullName()="
+				+ getFullName() + ", getEmail()=" + getEmail() + ", getPhone()=" + getPhone() + ", getAboutMe()="
+				+ getAboutMe() + ", getAddress()=" + getAddress() + ", getEducations()=" + getEducations()
+				+ ", getExperiences()=" + getExperiences() + ", getSkills()=" + getSkills() + ", getProjects()="
+				+ getProjects() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
+				+ super.toString() + "]";
+	}
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
