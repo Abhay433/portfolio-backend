@@ -1,0 +1,31 @@
+# Maven target directory
+target/
+
+# Logs
+*.log
+
+# IDE-specific files
+*.iml
+.idea/
+*.ipr
+*.iws
+.vscode/
+.project
+.classpath
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment and local config
+.env
+*.properties.local
+
+# Java compiled files
+*.class
+
+# Packaging outputs
+*.jar
+*.war
+*.ear
