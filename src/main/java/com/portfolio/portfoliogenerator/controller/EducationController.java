@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +32,7 @@ public class EducationController {
 		
 	}
 	
+	
 	@PostMapping("/addEducation/{id}")
     public ResponseEntity<String> addEducation(@RequestBody EducationDto educationDto, @PathVariable Long id) {
 		System.out.println(educationDto);
@@ -39,4 +41,15 @@ public class EducationController {
         
         return ResponseEntity.ok("Education added successfully");
     }
+	
+	
+	@DeleteMapping("/delete/{userId}/{educationId}")
+	public ResponseEntity<String> deleteEducation(
+	        @PathVariable Long userId,
+	        @PathVariable Long educationId) {
+	    
+	    educationService.deleteEducationByUserIdAndEducationId(userId, educationId);
+	    return ResponseEntity.ok("Education deleted successfully");
+	}
+
 }

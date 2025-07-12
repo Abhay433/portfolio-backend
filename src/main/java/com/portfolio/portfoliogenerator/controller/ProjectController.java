@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,5 +38,14 @@ public class ProjectController {
     public ResponseEntity<String> addProject(@RequestBody ProjectDto projectDto, @PathVariable Long userId) {
         projectService.addProject(projectDto, userId);
         return ResponseEntity.ok("Project added successfully");
+    }
+	
+	@DeleteMapping("/delete/{userId}/{projectId}")
+    public ResponseEntity<String> deleteProject(
+            @PathVariable Long userId,
+            @PathVariable Long projectId) {
+
+        projectService.deleteProjectByUserIdAndProjectId(userId, projectId);
+        return ResponseEntity.ok("Project deleted successfully");
     }
 }

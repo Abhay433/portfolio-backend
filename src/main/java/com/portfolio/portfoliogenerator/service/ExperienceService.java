@@ -10,5 +10,7 @@ public interface ExperienceService {
 	public List<Experience> getExperienceByUserId(Long id);
 	
 	public void addExperience(ExperienceDto experienceDto,Long id);
+	
+	void deleteExperienceByUserIdAndExperienceId(Long userId, Long experienceId);
 
 }

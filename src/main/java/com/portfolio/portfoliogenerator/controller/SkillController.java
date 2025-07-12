@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,5 +38,14 @@ public class SkillController {
 	      skillService.addSkill(skillDto, userId);
 	      return ResponseEntity.ok("Skill added successfully");
 	  }
+	
+	@DeleteMapping("/delete/{userId}/{skillId}")
+    public ResponseEntity<String> deleteSkill(
+            @PathVariable Long userId,
+            @PathVariable Long skillId) {
+
+        skillService.deleteSkillByUserIdAndSkillId(userId, skillId);
+        return ResponseEntity.ok("Skill deleted successfully");
+    }
 
 }

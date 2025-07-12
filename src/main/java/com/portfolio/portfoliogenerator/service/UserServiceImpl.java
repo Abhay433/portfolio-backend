@@ -20,8 +20,7 @@ import com.portfolio.portfoliogenerator.repo.UserRepository;
 
 @Service
 public class UserServiceImpl implements UserService {
-	
-	private static final int Optional = 0;
+
 	@Autowired
 	UserRepository userRepository;
 

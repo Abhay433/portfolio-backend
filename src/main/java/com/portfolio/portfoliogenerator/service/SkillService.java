@@ -11,6 +11,8 @@ public interface SkillService {
 	public List<Skill> getSkillByUserId(Long id);
 	
 	public void addSkill(SkillDto skilldto,Long id);
+	
+	public void deleteSkillByUserIdAndSkillId(Long userId, Long skillId);
 
 
 }

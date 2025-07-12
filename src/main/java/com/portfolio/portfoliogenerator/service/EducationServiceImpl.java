@@ -50,7 +50,18 @@ public class EducationServiceImpl implements EducationService {
 	        // Step 3: Save
 	        educationRepository.save(edu);
 	        
-	        System.out.println(user);
-		 
+	        System.out.println(user); 
 	 }
+	
+	public void deleteEducationByUserIdAndEducationId(Long userId, Long educationId) {
+	    Education education = educationRepository.findById(educationId)
+	        .orElseThrow(() -> new RuntimeException("Education not found with ID: " + educationId));
+
+	    if (!education.getUser().getId().equals(userId)) {
+	        throw new RuntimeException("This education doesn't belong to the given user.");
+	    }
+
+	    educationRepository.deleteById(educationId);
+	}
+
 }

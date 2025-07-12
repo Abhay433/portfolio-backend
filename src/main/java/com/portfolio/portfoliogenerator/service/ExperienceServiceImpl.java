@@ -46,5 +46,17 @@ public class ExperienceServiceImpl implements ExperienceService {
 
         experienceRepository.save(exp);
     }
+	
+	@Override
+    public void deleteExperienceByUserIdAndExperienceId(Long userId, Long experienceId) {
+        Experience experience = experienceRepository.findById(experienceId)
+            .orElseThrow(() -> new RuntimeException("Experience not found with ID: " + experienceId));
+
+        if (!experience.getUser().getId().equals(userId)) {
+            throw new RuntimeException("This experience doesn't belong to the given user.");
+        }
+
+        experienceRepository.deleteById(experienceId);
+    }
 
 }

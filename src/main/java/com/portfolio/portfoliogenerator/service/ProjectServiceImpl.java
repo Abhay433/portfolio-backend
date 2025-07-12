@@ -44,4 +44,15 @@ public class ProjectServiceImpl implements ProjectService{
         projectRepository.save(project);
     }
 		
+	@Override
+    public void deleteProjectByUserIdAndProjectId(Long userId, Long projectId) {
+        Project project = projectRepository.findById(projectId)
+            .orElseThrow(() -> new RuntimeException("Project not found with ID: " + projectId));
+
+        if (!project.getUser().getId().equals(userId)) {
+            throw new RuntimeException("This project doesn't belong to the given user.");
+        }
+
+        projectRepository.deleteById(projectId);
+    }
 }

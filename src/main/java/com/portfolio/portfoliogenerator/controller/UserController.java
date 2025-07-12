@@ -60,6 +60,8 @@ public class UserController {
 	        UserDto userDto = userService.getUserById(id);
 	        return ResponseEntity.ok(userDto);
 	    }
+	    
+	    
 
 	    
 	    

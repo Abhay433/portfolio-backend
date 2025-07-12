@@ -11,5 +11,6 @@ public interface EducationService {
 	
 	public void  addEducation(EducationDto educationDto, Long id);
 
+	public void deleteEducationByUserIdAndEducationId(Long userId, Long educationId);
 
 }

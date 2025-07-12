@@ -10,4 +10,6 @@ public interface ProjectService {
 	public List<Project> getProjectByUserId(Long id);
 	
 	public void addProject(ProjectDto projectDto,Long id);
+	
+	void deleteProjectByUserIdAndProjectId(Long userId, Long projectId);
 }
