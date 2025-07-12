@@ -1,11 +1,22 @@
 package com.portfolio.portfoliogenerator.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 
 @Entity
 public class Education {
 
-    @Id
+    @Override
+	public String toString() {
+		return "Education [id=" + id + ", degree=" + degree + ", institution=" + institution + ", startYear="
+				+ startYear + ", endYear=" + endYear + ", user=" + user + ", getId()=" + getId() + ", getDegree()="
+				+ getDegree() + ", getInstitution()=" + getInstitution() + ", getStartYear()=" + getStartYear()
+				+ ", getEndYear()=" + getEndYear() + ", getUser()=" + getUser() + ", getClass()=" + getClass()
+				+ ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
+	}
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -20,8 +31,9 @@ public class Education {
     
     
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
 	public Long getId() {

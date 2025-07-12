@@ -24,12 +24,12 @@ public class UserDto {
     
     private List<ProjectDto> projects;
     
+    
+    
+    
 	public String getFullName() {
 		return fullName;
 	}
-	
-	
-	
 	
 	public void setFullName(String fullName) {
 		this.fullName = fullName;

@@ -56,6 +56,7 @@ public class UserController {
 	    
 	    @GetMapping("/userportfolio/{id}")
 	    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+	    	System.out.println(id);
 	        UserDto userDto = userService.getUserById(id);
 	        return ResponseEntity.ok(userDto);
 	    }
