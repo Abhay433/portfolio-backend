@@ -3,67 +3,106 @@ package com.portfolio.portfoliogenerator.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.portfolio.portfoliogenerator.dto.UserDto;
 import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.service.UserService;
-
 
 @RestController
 @RequestMapping("/usercontroller")
 @CrossOrigin(origins = "*")
 public class UserController {
 
-	 	@Autowired
-	    private UserService userService;
+    @Autowired
+    private UserService userService;
 
-	    @PostMapping("/createuser")
-	    public ResponseEntity<String> saveUser(@RequestBody UserDto userDto) {
-	    	
-	        userService.saveUserProfile(userDto);
-	        
-	        return ResponseEntity.ok("User profile saved successfully.");
-	    }
-	    
-	    @GetMapping("/users")
-	    public List<User> getAllUser(@RequestBody UserDto userDto) {
-	        
-	        return userService.getAllUser(userDto);
-	    }
+    @PostMapping("/createuser")
+    public ResponseEntity<?> saveUser(@RequestBody UserDto userDto) {
+        try {
+            User savedUser = userService.saveUserProfile(userDto);
+            return ResponseEntity.ok().body(
+                new ApiResponse(true, "User profile saved successfully.", savedUser.getId())
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ApiResponse(false, "Error saving user profile: " + e.getMessage())
+            );
+        }
+    }
 
-	    @DeleteMapping("/delete/{id}")
-	    public ResponseEntity<String> deleteById(@PathVariable long id) {
-	        userService.deleteUserById(id);
-	        return ResponseEntity.ok("User deleted successfully");
-	    }
-	    
-	    
-	    @PutMapping("/update/{id}")
-	    public ResponseEntity<String> updateById(@PathVariable Long id, @RequestBody UserDto userDto) {
-	        userService.updateUserById(id, userDto);
-	        return ResponseEntity.ok("User updated successfully");
-	    }
-	    
-	    @GetMapping("/userportfolio/{id}")
-	    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-	    	System.out.println(id);
-	        UserDto userDto = userService.getUserById(id);
-	        return ResponseEntity.ok(userDto);
-	    }
 
-	    
-	    
-	    
-	    
+
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUser(@RequestBody UserDto userDto) {
+        try {
+            List<User> users = userService.getAllUser(userDto);
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ApiResponse(false, "Error fetching users: " + e.getMessage())
+            );
+        }
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable long id) {
+        try {
+            userService.deleteUserById(id);
+            return ResponseEntity.ok(new ApiResponse(true, "User deleted successfully."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ApiResponse(false, "Error deleting user: " + e.getMessage())
+            );
+        }
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateById(@PathVariable Long id, @RequestBody UserDto userDto) {
+        try {
+            userService.updateUserById(id, userDto);
+            return ResponseEntity.ok(new ApiResponse(true, "User updated successfully."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ApiResponse(false, "Error updating user: " + e.getMessage())
+            );
+        }
+    }
+
+    @GetMapping("/userportfolio/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        try {
+            UserDto userDto = userService.getUserById(id);
+            return ResponseEntity.ok(userDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ApiResponse(false, "User not found: " + e.getMessage())
+            );
+        }
+    }
+
+    // Optional: Response wrapper class
+    public static class ApiResponse {
+        private boolean success;
+        private String message;
+        private Long userId; // optional, only for create
+
+        public ApiResponse(boolean success, String message) {
+            this.success = success;
+            this.message = message;
+        }
+
+        public ApiResponse(boolean success, String message, Long userId) {
+            this.success = success;
+            this.message = message;
+            this.userId = userId;
+        }
+
+        // Getters
+        public boolean isSuccess() { return success; }
+        public String getMessage() { return message; }
+        public Long getUserId() { return userId; }
+    }
 }
-

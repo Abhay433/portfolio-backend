@@ -25,75 +25,72 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	UserRepository userRepository;
 
+
 	@Override
-	public void saveUserProfile(UserDto userDto) {
-		
-		User user = new User();
-        user.setFullName(userDto.getFullName());
-        user.setEmail(userDto.getEmail());
-        user.setPhone(userDto.getPhone());
-        user.setAboutMe(userDto.getAboutMe());
-        user.setAddress(userDto.getAddress());
-
-        // -------------------------------
-        // EDUCATION
-        List<Education> educationList = new ArrayList<>();
-        for (EducationDto eduDto : userDto.getEducations()) {
-            Education edu = new Education();
-            edu.setDegree(eduDto.getDegree());
-            edu.setInstitution(eduDto.getInstitution());
-            edu.setStartYear(eduDto.getStartYear());
-            edu.setEndYear(eduDto.getEndYear());
-            edu.setUser(user);
-            educationList.add(edu);
-        }
-        user.setEducations(educationList);
-
-        // -------------------------------
-        // EXPERIENCE
-        List<Experience> experienceList = new ArrayList<>();
-        for (ExperienceDto expDto : userDto.getExperiences()) {
-            Experience exp = new Experience();
-            exp.setJobTitle(expDto.getJobTitle());
-            exp.setCompany(expDto.getCompany());
-            exp.setStartDate(expDto.getStartDate());
-            exp.setEndDate(expDto.getEndDate());
-            exp.setDescription(expDto.getDescription());
-            exp.setUser(user);
-            experienceList.add(exp);
-        }
-        user.setExperiences(experienceList);
-
-        // -------------------------------
-        // SKILLS
-        List<Skill> skillList = new ArrayList<>();
-        for (SkillDto skillDto : userDto.getSkills()) {
-            Skill skill = new Skill();
-            skill.setName(skillDto.getName());
-            skill.setLevel(skillDto.getLevel());
-            skill.setUser(user);
-            skillList.add(skill);
-        }
-        user.setSkills(skillList);
-
-        // -------------------------------
-        // PROJECTS
-        List<Project> projectList = new ArrayList<>();
-        for (ProjectDto projDto : userDto.getProjects()) {
-            Project proj = new Project();
-            proj.setTitle(projDto.getTitle());
-            proj.setDescription(projDto.getDescription());
-            proj.setTechnologiesUsed(projDto.getTechnologiesUsed());
-            proj.setProjectUrl(projDto.getProjectUrl());
-            proj.setUser(user);
-            projectList.add(proj);
-        }
-        user.setProjects(projectList);
-
-        // Save everything
-        userRepository.save(user);
-		
+	public User saveUserProfile(UserDto userDto) {
+	    User user = new User();
+	    user.setFullName(userDto.getFullName());
+	    user.setEmail(userDto.getEmail());
+	    user.setPhone(userDto.getPhone());
+	    user.setAboutMe(userDto.getAboutMe());
+	    user.setAddress(userDto.getAddress());
+	
+	    // EDUCATION
+	    List<Education> educationList = new ArrayList<>();
+	    for (EducationDto eduDto : userDto.getEducations()) {
+	        Education edu = new Education();
+	        edu.setDegree(eduDto.getDegree());
+	        edu.setInstitution(eduDto.getInstitution());
+	        edu.setStartYear(eduDto.getStartYear());
+	        edu.setEndYear(eduDto.getEndYear());
+	        edu.setUser(user); // associate user
+	        educationList.add(edu);
+	    }
+	    user.setEducations(educationList);
+	
+	    // EXPERIENCE
+	    List<Experience> experienceList = new ArrayList<>();
+	    for (ExperienceDto expDto : userDto.getExperiences()) {
+	        Experience exp = new Experience();
+	        exp.setJobTitle(expDto.getJobTitle());
+	        exp.setCompany(expDto.getCompany());
+	        exp.setStartDate(expDto.getStartDate());
+	        exp.setEndDate(expDto.getEndDate());
+	        exp.setDescription(expDto.getDescription());
+	        exp.setUser(user); // associate user
+	        experienceList.add(exp);
+	    }
+	    user.setExperiences(experienceList);
+	
+	    // SKILLS
+	    List<Skill> skillList = new ArrayList<>();
+	    for (SkillDto skillDto : userDto.getSkills()) {
+	        Skill skill = new Skill();
+	        skill.setName(skillDto.getName());
+	        skill.setLevel(skillDto.getLevel());
+	        skill.setUser(user); // associate user
+	        skillList.add(skill);
+	    }
+	    user.setSkills(skillList);
+	
+	    // PROJECTS
+	    List<Project> projectList = new ArrayList<>();
+	    for (ProjectDto projDto : userDto.getProjects()) {
+	        Project proj = new Project();
+	        proj.setTitle(projDto.getTitle());
+	        proj.setDescription(projDto.getDescription());
+	        proj.setTechnologiesUsed(projDto.getTechnologiesUsed());
+	        proj.setProjectUrl(projDto.getProjectUrl());
+	        proj.setUser(user); // associate user
+	        projectList.add(proj);
+	    }
+	    user.setProjects(projectList);
+	
+	    // Save and return the user with generated ID
+	    return userRepository.save(user);
 	}
+
+
 
 	@Override
 	public List<User> getAllUser(UserDto userDto) {

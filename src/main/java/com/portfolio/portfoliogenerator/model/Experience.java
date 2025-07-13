@@ -14,8 +14,9 @@ public class Experience {
 
     private String jobTitle;
     private String company;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private Integer startDate;
+    private Integer endDate;
+
     private String description;
 
     @ManyToOne
@@ -47,19 +48,19 @@ public class Experience {
 		this.company = company;
 	}
 
-	public LocalDate getStartDate() {
+	public Integer getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(LocalDate startDate) {
+	public void setStartDate(Integer startDate) {
 		this.startDate = startDate;
 	}
 
-	public LocalDate getEndDate() {
+	public Integer getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(LocalDate endDate) {
+	public void setEndDate(Integer endDate) {
 		this.endDate = endDate;
 	}
 

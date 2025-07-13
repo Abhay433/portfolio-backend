@@ -5,8 +5,8 @@ import java.time.LocalDate;
 public class ExperienceDto {
     private String jobTitle;
     private String company;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private Integer startDate;
+    private Integer endDate;
     private String description;
 	public String getJobTitle() {
 		return jobTitle;
@@ -20,16 +20,16 @@ public class ExperienceDto {
 	public void setCompany(String company) {
 		this.company = company;
 	}
-	public LocalDate getStartDate() {
+	public Integer getStartDate() {
 		return startDate;
 	}
-	public void setStartDate(LocalDate startDate) {
+	public void setStartDate(Integer startDate) {
 		this.startDate = startDate;
 	}
-	public LocalDate getEndDate() {
+	public Integer getEndDate() {
 		return endDate;
 	}
-	public void setEndDate(LocalDate endDate) {
+	public void setEndDate(Integer endDate) {
 		this.endDate = endDate;
 	}
 	public String getDescription() {

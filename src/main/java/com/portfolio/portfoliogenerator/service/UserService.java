@@ -8,7 +8,7 @@ import com.portfolio.portfoliogenerator.model.User;
 
 public interface UserService {
 	
-	void saveUserProfile(UserDto userDto);
+	User saveUserProfile(UserDto userDto);
 	
 	List<User> getAllUser(UserDto userDto);
 	
