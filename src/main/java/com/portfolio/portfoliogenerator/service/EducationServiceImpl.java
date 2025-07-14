@@ -63,5 +63,23 @@ public class EducationServiceImpl implements EducationService {
 
 	    educationRepository.deleteById(educationId);
 	}
+	
+	@Override
+	public void updateEducationByUserId(Long userId, Long educationId, Education updatedEducation) {
+	    Education existingEdu = educationRepository.findById(educationId)
+	        .orElseThrow(() -> new RuntimeException("Education not found"));
+
+	    if (!existingEdu.getUser().getId().equals(userId)) {
+	        throw new RuntimeException("This education record does not belong to the user");
+	    }
+
+	    existingEdu.setDegree(updatedEducation.getDegree());
+	    existingEdu.setInstitution(updatedEducation.getInstitution());
+	    existingEdu.setStartYear(updatedEducation.getStartYear());
+	    existingEdu.setEndYear(updatedEducation.getEndYear());
+
+	    educationRepository.save(existingEdu);
+	}
+
 
 }

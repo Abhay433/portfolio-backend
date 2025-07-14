@@ -27,12 +27,14 @@ public class User {
     
     
 
+	@Column(name = "full_name")
     private String fullName;
     
     private String email;
      
     private String phone;
-     
+    
+    @Column(name = "about_me")
     private String aboutMe;
     
     private String address;

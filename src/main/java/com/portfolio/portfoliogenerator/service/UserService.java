@@ -2,13 +2,14 @@ package com.portfolio.portfoliogenerator.service;
 
 import java.util.List;
 
+import com.portfolio.portfoliogenerator.dto.UserBasicDto;
 import com.portfolio.portfoliogenerator.dto.UserDto;
 import com.portfolio.portfoliogenerator.model.User;
 
 
 public interface UserService {
 	
-	void saveUserProfile(UserDto userDto);
+	User saveUserProfile(UserDto userDto);
 	
 	List<User> getAllUser(UserDto userDto);
 	
@@ -17,6 +18,8 @@ public interface UserService {
 	void deleteUserById(Long id);
 	
 	UserDto getUserById(Long id);
+	
+	void updateUserBasicDetails(Long id,UserBasicDto userBasicDto);
 	
 	
 }

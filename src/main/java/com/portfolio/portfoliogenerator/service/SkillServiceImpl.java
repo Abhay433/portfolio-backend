@@ -53,6 +53,21 @@ public class SkillServiceImpl implements SkillService{
 
         skillRepository.deleteById(skillId);
     }
-	
 
+    @Override
+    public void updateSkillByUserIdAndSkillId(Long userId, Long skillId, SkillDto skillDto) {
+        Skill skill = skillRepository.findById(skillId)
+            .orElseThrow(() -> new RuntimeException("Skill not found with ID: " + skillId));
+
+        if (!skill.getUser().getId().equals(userId)) {
+            throw new RuntimeException("This skill doesn't belong to the given user.");
+        }
+
+        // Update fields
+        skill.setName(skillDto.getName());
+        skill.setLevel(skillDto.getLevel());
+
+        // Save changes
+        skillRepository.save(skill);
+    }
 }

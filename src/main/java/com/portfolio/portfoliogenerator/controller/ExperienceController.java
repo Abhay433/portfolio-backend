@@ -3,53 +3,79 @@ package com.portfolio.portfoliogenerator.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 
 import com.portfolio.portfoliogenerator.dto.ExperienceDto;
 import com.portfolio.portfoliogenerator.model.Experience;
 import com.portfolio.portfoliogenerator.service.ExperienceService;
 
-
 @RestController
 @RequestMapping("/experiencecontroller")
 @CrossOrigin(origins = "*")
 public class ExperienceController {
-	
-	@Autowired
-	ExperienceService experienceService;
-	
-	@GetMapping("/userexperience/{id}")
-	public List<Experience> getExperienceByUserId(@PathVariable Long id){
-		List<Experience> experience=experienceService.getExperienceByUserId(id);
-		
-		return experience;
-	}
 
-	@PostMapping("/addExperience/{userId}")
-    public ResponseEntity<String> addExperience(@RequestBody ExperienceDto experienceDto, @PathVariable Long userId) {
-        experienceService.addExperience(experienceDto, userId);
-        return ResponseEntity.ok("Experience added successfully");
+    @Autowired
+    private ExperienceService experienceService;
+
+    @PostMapping("/addExperience/{userId}")
+    public ResponseEntity<?> addExperience(@RequestBody ExperienceDto experienceDto, @PathVariable Long userId) {
+        try {
+            experienceService.addExperience(experienceDto, userId);
+            return ResponseEntity.ok(new ApiResponse(true, "Experience added successfully."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ApiResponse(false, "Error adding experience: " + e.getMessage()));
+        }
     }
-	
-	
+
+    @GetMapping("/userexperience/{userId}")
+    public ResponseEntity<?> getExperienceByUserId(@PathVariable Long userId) {
+        try {
+            List<Experience> experienceList = experienceService.getExperienceByUserId(userId);
+            return ResponseEntity.ok(experienceList);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ApiResponse(false, "Error fetching experience: " + e.getMessage()));
+        }
+    }
 
     @DeleteMapping("/delete/{userId}/{experienceId}")
-	  public ResponseEntity<String> deleteExperience(
-	          @PathVariable Long userId,
-	          @PathVariable Long experienceId) {
+    public ResponseEntity<?> deleteExperience(@PathVariable Long userId, @PathVariable Long experienceId) {
+        try {
+            experienceService.deleteExperienceByUserIdAndExperienceId(userId, experienceId);
+            return ResponseEntity.ok(new ApiResponse(true, "Experience deleted successfully."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ApiResponse(false, "Error deleting experience: " + e.getMessage()));
+        }
+    }
 
-	      experienceService.deleteExperienceByUserIdAndExperienceId(userId, experienceId);
-	      return ResponseEntity.ok("Experience deleted successfully");
-	    }
-	
+    @PutMapping("/user/{userId}/experience/{experienceId}")
+    public ResponseEntity<?> updateExperienceByUserIdAndExperienceId(
+            @PathVariable Long userId,
+            @PathVariable Long experienceId,
+            @RequestBody ExperienceDto experienceDto) {
+        try {
+            experienceService.updateExperienceByUserId(userId, experienceId, experienceDto);
+            return ResponseEntity.ok(new ApiResponse(true, "Experience updated successfully."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ApiResponse(false, "Error updating experience: " + e.getMessage()));
+        }
+    }
 
-	
+    // ✅ Reusable response class
+    public static class ApiResponse {
+        private boolean success;
+        private String message;
+
+        public ApiResponse(boolean success, String message) {
+            this.success = success;
+            this.message = message;
+        }
+
+        public boolean isSuccess() { return success; }
+        public String getMessage() { return message; }
+    }
 }

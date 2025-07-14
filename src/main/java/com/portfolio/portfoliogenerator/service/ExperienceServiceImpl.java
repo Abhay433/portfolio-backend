@@ -37,6 +37,7 @@ public class ExperienceServiceImpl implements ExperienceService {
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
         Experience exp = new Experience();
+        
         exp.setJobTitle(experienceDto.getJobTitle());
         exp.setCompany(experienceDto.getCompany());
         exp.setStartDate(experienceDto.getStartDate());
@@ -57,6 +58,24 @@ public class ExperienceServiceImpl implements ExperienceService {
         }
 
         experienceRepository.deleteById(experienceId);
+    }
+	
+	@Override
+    public void updateExperienceByUserId(Long userId, Long experienceId, ExperienceDto updatedExperience) {
+        Experience existingExperience = experienceRepository.findById(experienceId)
+            .orElseThrow(() -> new RuntimeException("Experience not found with ID: " + experienceId));
+
+        if (!existingExperience.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Experience record does not belong to user with ID: " + userId);
+        }
+
+        existingExperience.setJobTitle(updatedExperience.getJobTitle());
+        existingExperience.setCompany(updatedExperience.getCompany());
+        existingExperience.setStartDate(updatedExperience.getStartDate());
+        existingExperience.setEndDate(updatedExperience.getEndDate());
+        existingExperience.setDescription(updatedExperience.getDescription());
+
+        experienceRepository.save(existingExperience);
     }
 
 }

@@ -13,6 +13,8 @@ public interface SkillService {
 	public void addSkill(SkillDto skilldto,Long id);
 	
 	public void deleteSkillByUserIdAndSkillId(Long userId, Long skillId);
-
+	
+	void updateSkillByUserIdAndSkillId(Long userId, Long skillId, SkillDto skillDto);
+	
 
 }

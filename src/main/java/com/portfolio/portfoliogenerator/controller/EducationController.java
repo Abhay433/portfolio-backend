@@ -4,14 +4,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import com.portfolio.portfoliogenerator.dto.EducationDto;
 import com.portfolio.portfoliogenerator.model.Education;
@@ -22,34 +16,72 @@ import com.portfolio.portfoliogenerator.service.EducationService;
 @CrossOrigin(origins = "*")
 public class EducationController {
 
-	@Autowired
-	EducationService educationService;
-	
-	@GetMapping("/usereducation/{id}")
-	public List<Education> getEducationByUserId(@PathVariable Long id){
-		
-		return educationService.getEducationByUserId(id);
-		
-	}
-	
-	
-	@PostMapping("/addEducation/{id}")
-    public ResponseEntity<String> addEducation(@RequestBody EducationDto educationDto, @PathVariable Long id) {
-		System.out.println(educationDto);
-		
-        educationService.addEducation(educationDto, id);
-        
-        return ResponseEntity.ok("Education added successfully");
-    }
-	
-	
-	@DeleteMapping("/delete/{userId}/{educationId}")
-	public ResponseEntity<String> deleteEducation(
-	        @PathVariable Long userId,
-	        @PathVariable Long educationId) {
-	    
-	    educationService.deleteEducationByUserIdAndEducationId(userId, educationId);
-	    return ResponseEntity.ok("Education deleted successfully");
-	}
+    @Autowired
+    private EducationService educationService;
 
+    @GetMapping("/usereducation/{id}")
+    public ResponseEntity<?> getEducationByUserId(@PathVariable Long id) {
+        try {
+            List<Education> educationList = educationService.getEducationByUserId(id);
+            return ResponseEntity.ok(educationList);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ApiResponse(false, "Error fetching education: " + e.getMessage())
+            );
+        }
+    }
+
+    @PostMapping("/addEducation/{id}")
+    public ResponseEntity<?> addEducation(@RequestBody EducationDto educationDto, @PathVariable Long id) {
+        try {
+            educationService.addEducation(educationDto, id);
+            return ResponseEntity.ok(new ApiResponse(true, "Education added successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ApiResponse(false, "Error adding education: " + e.getMessage())
+            );
+        }
+    }
+
+    @DeleteMapping("/delete/{userId}/{educationId}")
+    public ResponseEntity<?> deleteEducation(@PathVariable Long userId, @PathVariable Long educationId) {
+        try {
+            educationService.deleteEducationByUserIdAndEducationId(userId, educationId);
+            return ResponseEntity.ok(new ApiResponse(true, "Education deleted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ApiResponse(false, "Error deleting education: " + e.getMessage())
+            );
+        }
+    }
+
+    @PutMapping("/user/{userId}/education/{educationId}")
+    public ResponseEntity<?> updateEducation(
+        @PathVariable Long userId,
+        @PathVariable Long educationId,
+        @RequestBody Education education) {
+        
+        try {
+            educationService.updateEducationByUserId(userId, educationId, education);
+            return ResponseEntity.ok(new ApiResponse(true, "Education updated successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ApiResponse(false, "Error updating education: " + e.getMessage())
+            );
+        }
+    }
+
+    // Inner class for consistent API responses
+    public static class ApiResponse {
+        private boolean success;
+        private String message;
+
+        public ApiResponse(boolean success, String message) {
+            this.success = success;
+            this.message = message;
+        }
+
+        public boolean isSuccess() { return success; }
+        public String getMessage() { return message; }
+    }
 }

@@ -11,6 +11,8 @@ public interface ExperienceService {
 	
 	public void addExperience(ExperienceDto experienceDto,Long id);
 	
-	void deleteExperienceByUserIdAndExperienceId(Long userId, Long experienceId);
+	public void deleteExperienceByUserIdAndExperienceId(Long userId, Long experienceId);
+	
+	public void updateExperienceByUserId(Long userId, Long experienceId, ExperienceDto updatedExperience);
 
 }
