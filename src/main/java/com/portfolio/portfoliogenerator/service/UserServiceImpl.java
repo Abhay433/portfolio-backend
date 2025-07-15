@@ -1,10 +1,16 @@
 package com.portfolio.portfoliogenerator.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.portfolio.portfoliogenerator.dto.EducationDto;
 import com.portfolio.portfoliogenerator.dto.ExperienceDto;
@@ -19,11 +25,16 @@ import com.portfolio.portfoliogenerator.model.Skill;
 import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.repo.UserRepository;
 
+
+
 @Service
 public class UserServiceImpl implements UserService {
 
 	@Autowired
 	UserRepository userRepository;
+	
+	private final String UPLOAD_DIR = "uploadsProfile/";
+
 
 
 	@Override
@@ -224,6 +235,115 @@ public class UserServiceImpl implements UserService {
 	    userRepository.save(existingUser);
 	}
 
+	@Override
+    public void uploadProfileImage(Long userId, MultipartFile file) {
+        try {
+            User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+            // Create uploads directory if not exists
+            File uploadFolder = new File(UPLOAD_DIR);
+            if (!uploadFolder.exists()) uploadFolder.mkdirs();
+
+            // Generate unique filename
+            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            Path filePath = Paths.get(UPLOAD_DIR + fileName);
+
+            // Save file to disk
+            Files.write(filePath, file.getBytes());
+
+            // Save URL/path to DB
+            user.setProfileImageUrl("/" + UPLOAD_DIR + fileName);
+            userRepository.save(user);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload profile image", e);
+        }
+    }
+		
+	
+	@Override
+	public User saveUserProfileWithImage(UserDto userDto, MultipartFile file) {
+	    User user = new User();
+	    user.setFullName(userDto.getFullName());
+	    user.setEmail(userDto.getEmail());
+	    user.setPhone(userDto.getPhone());
+	    user.setAboutMe(userDto.getAboutMe());
+	    user.setAddress(userDto.getAddress());
+
+	    // 🔽 Save image file
+	    if (file != null && !file.isEmpty()) {
+	        try {
+	            String uploadDir = "uploads/";
+	            File dir = new File(uploadDir);
+	            if (!dir.exists()) dir.mkdirs();
+
+	            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+	            Path filePath = Paths.get(uploadDir + fileName);
+	            Files.write(filePath, file.getBytes());
+
+	            user.setProfileImageUrl("/" + uploadDir + fileName);
+	        } catch (IOException e) {
+	            throw new RuntimeException("Failed to save image: " + e.getMessage());
+	        }
+	    }
+
+	    // EDUCATION
+	    List<Education> educationList = new ArrayList<>();
+	    for (EducationDto eduDto : userDto.getEducations()) {
+	        Education edu = new Education();
+	        edu.setDegree(eduDto.getDegree());
+	        edu.setInstitution(eduDto.getInstitution());
+	        edu.setStartYear(eduDto.getStartYear());
+	        edu.setEndYear(eduDto.getEndYear());
+	        edu.setUser(user);
+	        educationList.add(edu);
+	    }
+	    user.setEducations(educationList);
+
+	    // EXPERIENCE
+	    List<Experience> experienceList = new ArrayList<>();
+	    for (ExperienceDto expDto : userDto.getExperiences()) {
+	        Experience exp = new Experience();
+	        exp.setJobTitle(expDto.getJobTitle());
+	        exp.setCompany(expDto.getCompany());
+	        exp.setStartDate(expDto.getStartDate());
+	        exp.setEndDate(expDto.getEndDate());
+	        exp.setDescription(expDto.getDescription());
+	        exp.setUser(user);
+	        experienceList.add(exp);
+	    }
+	    user.setExperiences(experienceList);
+
+	    // SKILLS
+	    List<Skill> skillList = new ArrayList<>();
+	    for (SkillDto skillDto : userDto.getSkills()) {
+	        Skill skill = new Skill();
+	        skill.setName(skillDto.getName());
+	        skill.setLevel(skillDto.getLevel());
+	        skill.setUser(user);
+	        skillList.add(skill);
+	    }
+	    user.setSkills(skillList);
+
+	    // PROJECTS
+	    List<Project> projectList = new ArrayList<>();
+	    for (ProjectDto projDto : userDto.getProjects()) {
+	        Project proj = new Project();
+	        proj.setTitle(projDto.getTitle());
+	        proj.setDescription(projDto.getDescription());
+	        proj.setTechnologiesUsed(projDto.getTechnologiesUsed());
+	        proj.setProjectUrl(projDto.getProjectUrl());
+	        proj.setUser(user);
+	        projectList.add(proj);
+	    }
+	    user.setProjects(projectList);
+
+	    return userRepository.save(user);
+	}
+
+
+	
 
 
 	@Override
@@ -244,7 +364,5 @@ public class UserServiceImpl implements UserService {
        
         
 	}
-
-
 
 }

@@ -9,17 +9,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Table(name = "users")
 public class User {
     
-    @Override
-	public String toString() {
-		return "User [id=" + id + ", fullName=" + fullName + ", email=" + email + ", phone=" + phone + ", aboutMe="
-				+ aboutMe + ", address=" + address + ", educations=" + educations + ", experiences=" + experiences
-				+ ", skills=" + skills + ", projects=" + projects + ", getId()=" + getId() + ", getFullName()="
-				+ getFullName() + ", getEmail()=" + getEmail() + ", getPhone()=" + getPhone() + ", getAboutMe()="
-				+ getAboutMe() + ", getAddress()=" + getAddress() + ", getEducations()=" + getEducations()
-				+ ", getExperiences()=" + getExperiences() + ", getSkills()=" + getSkills() + ", getProjects()="
-				+ getProjects() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
-				+ super.toString() + "]";
-	}
+    
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +28,9 @@ public class User {
     private String aboutMe;
     
     private String address;
+    
+    @Column(name = "profile_image_url")
+	private String profileImageUrl;
     
  
     
@@ -114,6 +107,14 @@ public class User {
 
 	
 
+	public String getProfileImageUrl() {
+		return profileImageUrl;
+	}
+
+	public void setProfileImageUrl(String profileImageUrl) {
+		this.profileImageUrl = profileImageUrl;
+	}
+
 	public List<Education> getEducations() {
 		return educations;
 	}
@@ -147,4 +148,16 @@ public class User {
 	}
 
     // Getters & Setters
+	
+	 @Override
+		public String toString() {
+			return "User [id=" + id + ", fullName=" + fullName + ", email=" + email + ", phone=" + phone + ", aboutMe="
+					+ aboutMe + ", address=" + address + ", educations=" + educations + ", experiences=" + experiences
+					+ ", skills=" + skills + ", projects=" + projects + ", getId()=" + getId() + ", getFullName()="
+					+ getFullName() + ", getEmail()=" + getEmail() + ", getPhone()=" + getPhone() + ", getAboutMe()="
+					+ getAboutMe() + ", getAddress()=" + getAddress() + ", getEducations()=" + getEducations()
+					+ ", getExperiences()=" + getExperiences() + ", getSkills()=" + getSkills() + ", getProjects()="
+					+ getProjects() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
+					+ super.toString() + "]";
+		}
 }

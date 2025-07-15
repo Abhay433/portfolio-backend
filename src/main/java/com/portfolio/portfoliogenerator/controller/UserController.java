@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.portfolio.portfoliogenerator.dto.UserBasicDto;
 import com.portfolio.portfoliogenerator.dto.UserDto;
 import com.portfolio.portfoliogenerator.model.User;
@@ -96,8 +98,40 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+    
+    @PutMapping("/uploadprofile/{userId}")
+    public ResponseEntity<ApiResponse> uploadProfileImage(
+            @PathVariable Long userId,
+            @RequestParam("image") MultipartFile imageFile) {
+        try {
+            userService.uploadProfileImage(userId, imageFile);
+            return ResponseEntity.ok(new ApiResponse(true, "Profile image uploaded successfully.",userId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "Failed to upload profile image: " + e.getMessage()));
+        }
+    }
+    
+    @PostMapping("/createuserwithimage")
+    public ResponseEntity<?> saveUserWithImage(
+            @RequestPart("user") UserDto userDto,
+            @RequestPart("image") MultipartFile file) {
+        try {
+            User savedUser = userService.saveUserProfileWithImage(userDto, file);
+            return ResponseEntity.ok().body(
+                    new ApiResponse(true, "User profile saved successfully with image.", savedUser.getId()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new ApiResponse(false, "Error saving user profile: " + e.getMessage()));
+        }
+    }
 
+
+    
+
+    
     // Optional: Response wrapper class
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class ApiResponse {
         private boolean success;
         private String message;
