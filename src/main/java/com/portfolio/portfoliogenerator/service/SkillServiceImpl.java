@@ -54,20 +54,22 @@ public class SkillServiceImpl implements SkillService{
         skillRepository.deleteById(skillId);
     }
 
-    @Override
-    public void updateSkillByUserIdAndSkillId(Long userId, Long skillId, SkillDto skillDto) {
-        Skill skill = skillRepository.findById(skillId)
-            .orElseThrow(() -> new RuntimeException("Skill not found with ID: " + skillId));
+	@Override
+	public List<Skill> updateSkillByUserIdAndSkillId(Long userId, List<SkillDto> skillDtoList) {
+	    List<Skill> existingSkills = skillRepository.findByUser_id(userId);
 
-        if (!skill.getUser().getId().equals(userId)) {
-            throw new RuntimeException("This skill doesn't belong to the given user.");
-        }
+	    if (existingSkills.size() != skillDtoList.size()) {
+	        throw new RuntimeException("Mismatch between existing and incoming skill count");
+	    }
 
-        // Update fields
-        skill.setName(skillDto.getName());
-        skill.setLevel(skillDto.getLevel());
+	    for (int i = 0; i < existingSkills.size(); i++) {
+	        Skill skill = existingSkills.get(i);
+	        SkillDto dto = skillDtoList.get(i);
 
-        // Save changes
-        skillRepository.save(skill);
-    }
+	        if (dto.getName() != null) skill.setName(dto.getName());
+	        if (dto.getLevel() != null) skill.setLevel(dto.getLevel());
+	    }
+
+	    return skillRepository.saveAll(existingSkills);
+	}
 }

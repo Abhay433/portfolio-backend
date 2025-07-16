@@ -55,19 +55,18 @@ public class EducationController {
         }
     }
 
-    @PutMapping("/user/{userId}/education/{educationId}")
-    public ResponseEntity<?> updateEducation(
+    @PutMapping("/user/education/{userId}/{educationId}")
+    public ResponseEntity<Education> updateEducation(
         @PathVariable Long userId,
         @PathVariable Long educationId,
-        @RequestBody Education education) {
+        @RequestBody EducationDto educationDto) {
         
         try {
-            educationService.updateEducationByUserId(userId, educationId, education);
-            return ResponseEntity.ok(new ApiResponse(true, "Education updated successfully"));
+            Education education=educationService.updateEducationByUserId(userId, educationId, educationDto);
+            return ResponseEntity.ok(education);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiResponse(false, "Error updating education: " + e.getMessage())
-            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            
         }
     }
 

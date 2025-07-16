@@ -65,7 +65,7 @@ public class EducationServiceImpl implements EducationService {
 	}
 	
 	@Override
-	public void updateEducationByUserId(Long userId, Long educationId, Education updatedEducation) {
+	public Education updateEducationByUserId(Long userId, Long educationId, EducationDto updatedEducationDto) {
 	    Education existingEdu = educationRepository.findById(educationId)
 	        .orElseThrow(() -> new RuntimeException("Education not found"));
 
@@ -73,13 +73,26 @@ public class EducationServiceImpl implements EducationService {
 	        throw new RuntimeException("This education record does not belong to the user");
 	    }
 
-	    existingEdu.setDegree(updatedEducation.getDegree());
-	    existingEdu.setInstitution(updatedEducation.getInstitution());
-	    existingEdu.setStartYear(updatedEducation.getStartYear());
-	    existingEdu.setEndYear(updatedEducation.getEndYear());
+	    if (updatedEducationDto.getDegree() != null) {
+	        existingEdu.setDegree(updatedEducationDto.getDegree());
+	    }
+
+	    if (updatedEducationDto.getInstitution() != null) {
+	        existingEdu.setInstitution(updatedEducationDto.getInstitution());
+	    }
+
+	    if (updatedEducationDto.getStartYear() != null) {
+	        existingEdu.setStartYear(updatedEducationDto.getStartYear());
+	    }
+
+	    if (updatedEducationDto.getEndYear() != null) {
+	        existingEdu.setEndYear(updatedEducationDto.getEndYear());
+	    }
 
 	    educationRepository.save(existingEdu);
+	    return existingEdu;
 	}
-
-
 }
+
+
+

@@ -61,21 +61,36 @@ public class ExperienceServiceImpl implements ExperienceService {
     }
 	
 	@Override
-    public void updateExperienceByUserId(Long userId, Long experienceId, ExperienceDto updatedExperience) {
-        Experience existingExperience = experienceRepository.findById(experienceId)
-            .orElseThrow(() -> new RuntimeException("Experience not found with ID: " + experienceId));
+	public Experience updateExperienceByUserId(Long userId, Long experienceId, ExperienceDto updatedExperience) {
+	    Experience existingExperience = experienceRepository.findById(experienceId)
+	        .orElseThrow(() -> new RuntimeException("Experience not found with ID: " + experienceId));
 
-        if (!existingExperience.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Experience record does not belong to user with ID: " + userId);
-        }
+	    if (!existingExperience.getUser().getId().equals(userId)) {
+	        throw new RuntimeException("Experience record does not belong to user with ID: " + userId);
+	    }
 
-        existingExperience.setJobTitle(updatedExperience.getJobTitle());
-        existingExperience.setCompany(updatedExperience.getCompany());
-        existingExperience.setStartDate(updatedExperience.getStartDate());
-        existingExperience.setEndDate(updatedExperience.getEndDate());
-        existingExperience.setDescription(updatedExperience.getDescription());
+	    if (updatedExperience.getJobTitle() != null) {
+	        existingExperience.setJobTitle(updatedExperience.getJobTitle());
+	    }
 
-        experienceRepository.save(existingExperience);
-    }
+	    if (updatedExperience.getCompany() != null) {
+	        existingExperience.setCompany(updatedExperience.getCompany());
+	    }
+
+	    if (updatedExperience.getStartDate() != null) {
+	        existingExperience.setStartDate(updatedExperience.getStartDate());
+	    }
+
+	    if (updatedExperience.getEndDate() != null) {
+	        existingExperience.setEndDate(updatedExperience.getEndDate());
+	    }
+
+	    if (updatedExperience.getDescription() != null) {
+	        existingExperience.setDescription(updatedExperience.getDescription());
+	    }
+
+	    experienceRepository.save(existingExperience);
+	    return existingExperience;
+	}
 
 }

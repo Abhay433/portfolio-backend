@@ -15,13 +15,13 @@ public interface UserService {
 	
 	List<User> getAllUser(UserDto userDto);
 	
-	void updateUserById(Long id ,UserDto userdto);
+	public User updateUserById(Long id ,UserDto userdto);
 
 	void deleteUserById(Long id);
 	
 	UserDto getUserById(Long id);
 	
-	void updateUserBasicDetails(Long id,UserBasicDto userBasicDto);
+	User updateUserBasicDetails(Long id,UserBasicDto userBasicDto);
 	
 	void uploadProfileImage(Long userId, MultipartFile file);
 	

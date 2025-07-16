@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -169,7 +168,7 @@ public class UserServiceImpl implements UserService {
 	
 	
 	@Override
-	public void updateUserById(Long id, UserDto userDto) {
+	public User updateUserById(Long id, UserDto userDto) {
 	    User existingUser = userRepository.findById(id)
 	        .orElseThrow(() -> new RuntimeException("User not found by id: " + id));
 
@@ -233,6 +232,7 @@ public class UserServiceImpl implements UserService {
 
 	    // Finally, save
 	    userRepository.save(existingUser);
+	    return existingUser;
 	}
 
 	@Override
@@ -347,22 +347,34 @@ public class UserServiceImpl implements UserService {
 
 
 	@Override
-	public void updateUserBasicDetails(Long id, UserBasicDto userBasicDto) {
+	public User updateUserBasicDetails(Long id, UserBasicDto userBasicDto) {
 
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-        
-        user.setFullName(userBasicDto.getFullName());
-        user.setPhone(userBasicDto.getPhone()); 
-        
-        user.setEmail(userBasicDto.getEmail());
-        user.setAboutMe(userBasicDto.getAboutMe());
-        user.setAddress(userBasicDto.getAddress());
-        
-        userRepository.save(user);
-        
-       
-        
+	    User user = userRepository.findById(id)
+	        .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+	    if (userBasicDto.getFullName() != null) {
+	        user.setFullName(userBasicDto.getFullName());
+	    }
+
+	    if (userBasicDto.getPhone() != null) {
+	        user.setPhone(userBasicDto.getPhone());
+	    }
+
+	    if (userBasicDto.getEmail() != null) {
+	        user.setEmail(userBasicDto.getEmail());
+	    }
+
+	    if (userBasicDto.getAboutMe() != null) {
+	        user.setAboutMe(userBasicDto.getAboutMe());
+	    }
+
+	    if (userBasicDto.getAddress() != null) {
+	        user.setAddress(userBasicDto.getAddress());
+	    }
+
+	    userRepository.save(user);
+	    return user;
 	}
+
 
 }

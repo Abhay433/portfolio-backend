@@ -56,7 +56,9 @@ public class ProjectServiceImpl implements ProjectService{
         projectRepository.deleteById(projectId);
     }
 	
-	public void updateProjectByUserIdAndProjectId(Long userId, Long projectId, ProjectDto updatedProject) {
+	
+	
+	public Project updateProjectByUserIdAndProjectId(Long userId, Long projectId, ProjectDto updatedProject) {
 	    Project existingProject = projectRepository.findById(projectId)
 	            .orElseThrow(() -> new RuntimeException("Project not found"));
 
@@ -64,12 +66,25 @@ public class ProjectServiceImpl implements ProjectService{
 	        throw new RuntimeException("User ID mismatch with project owner");
 	    }
 
-	    existingProject.setTitle(updatedProject.getTitle());
-	    existingProject.setDescription(updatedProject.getDescription());
-	    existingProject.setTechnologiesUsed(updatedProject.getTechnologiesUsed());
-	    existingProject.setProjectUrl(updatedProject.getProjectUrl());
+	    if (updatedProject.getTitle() != null) {
+	        existingProject.setTitle(updatedProject.getTitle());
+	    }
 
-	     projectRepository.save(existingProject);
+	    if (updatedProject.getDescription() != null) {
+	        existingProject.setDescription(updatedProject.getDescription());
+	    }
+
+	    if (updatedProject.getTechnologiesUsed() != null) {
+	        existingProject.setTechnologiesUsed(updatedProject.getTechnologiesUsed());
+	    }
+
+	    if (updatedProject.getProjectUrl() != null) {
+	        existingProject.setProjectUrl(updatedProject.getProjectUrl());
+	    }
+
+	    projectRepository.save(existingProject);
+	    return existingProject;
 	}
+
 
 }

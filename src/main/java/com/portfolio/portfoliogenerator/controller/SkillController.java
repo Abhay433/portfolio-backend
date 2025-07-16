@@ -51,14 +51,14 @@ public class SkillController {
         }
     }
 
-    @PutMapping("/update/{userId}/{skillId}")
-    public ResponseEntity<?> updateSkill(@PathVariable Long userId, @PathVariable Long skillId, @RequestBody SkillDto skillDto) {
+    @PutMapping("/update/{userId}")
+    public ResponseEntity<List<Skill>> updateSkill(@PathVariable Long userId, @RequestBody List< SkillDto> skillDto) {
         try {
-            skillService.updateSkillByUserIdAndSkillId(userId, skillId, skillDto);
-            return ResponseEntity.ok(new ApiResponse(true, "Skill updated successfully."));
+        	List<Skill> updatedSkill =skillService.updateSkillByUserIdAndSkillId(userId, skillDto);
+        	ResponseEntity<List<Skill>> response= ResponseEntity.ok(updatedSkill);
+        	return response;
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiResponse(false, "Error updating skill: " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

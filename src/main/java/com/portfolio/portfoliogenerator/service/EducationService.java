@@ -13,6 +13,6 @@ public interface EducationService {
 
 	public void deleteEducationByUserIdAndEducationId(Long userId, Long deleteEducationId);
 	
-	public void updateEducationByUserId(Long userId,Long EducationId,Education updatedEducation);
+	public Education updateEducationByUserId(Long userId,Long EducationId,EducationDto updatedEducationDto);
 
 }

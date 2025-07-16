@@ -88,16 +88,17 @@ public class UserController {
     
     
     @PutMapping("/updatebasicdetails/{id}")
-    public ResponseEntity<ApiResponse> updateUserBasicDetails(@PathVariable Long id, @RequestBody UserBasicDto userBasicDto) {
+    public ResponseEntity<User> updateUserBasicDetails(
+            @PathVariable Long id,
+            @RequestBody UserBasicDto userBasicDto) {
         try {
-            userService.updateUserBasicDetails(id, userBasicDto);
-            ApiResponse response = new ApiResponse(true, "User updated successfully");
-            return ResponseEntity.ok(response);
+            User updatedUser = userService.updateUserBasicDetails(id, userBasicDto);
+            return ResponseEntity.ok(updatedUser); // ✅ return updated user to frontend
         } catch (Exception e) {
-            ApiResponse response = new ApiResponse(false, "Error updating user: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     
     @PutMapping("/uploadprofile/{userId}")
     public ResponseEntity<ApiResponse> uploadProfileImage(

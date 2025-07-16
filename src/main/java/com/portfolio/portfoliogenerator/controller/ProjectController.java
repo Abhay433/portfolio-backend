@@ -52,17 +52,17 @@ public class ProjectController {
     }
 
     @PutMapping("/user/{userId}/project/{projectId}")
-    public ResponseEntity<?> updateProjectByUserIdAndProjectId(
+    public ResponseEntity<Project> updateProjectByUserIdAndProjectId(
             @PathVariable Long userId,
             @PathVariable Long projectId,
             @RequestBody ProjectDto projectDto) {
         try {
-            projectService.updateProjectByUserIdAndProjectId(userId, projectId, projectDto);
-            return ResponseEntity.ok(new ApiResponse(true, "Project updated successfully."));
+            Project project=projectService.updateProjectByUserIdAndProjectId(userId, projectId, projectDto);
+            return ResponseEntity.ok(project);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiResponse(false, "Error updating project: " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+        
     }
 
     // ✅ Common reusable response class
