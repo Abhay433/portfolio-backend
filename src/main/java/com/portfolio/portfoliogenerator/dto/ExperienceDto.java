@@ -1,6 +1,5 @@
 package com.portfolio.portfoliogenerator.dto;
 
-import java.time.LocalDate;
 
 public class ExperienceDto {
     private String jobTitle;

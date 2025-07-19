@@ -79,6 +79,18 @@ public class UserServiceImpl implements UserService {
 	    }
 	    userDto.setEducations(eduDtos);
 	    
+	    List<ExperienceDto> expDto = new ArrayList<>();
+	    for (Experience exp : user.getExperiences()) {
+	    	ExperienceDto dto = new ExperienceDto();
+	        dto.setJobTitle(exp.getJobTitle());
+	        dto.setCompany(exp.getCompany());
+	        dto.setDescription(exp.getDescription());
+	        dto.setEndDate(exp.getEndDate());
+	        dto.setStartDate(exp.getStartDate());
+	        expDto.add(dto);
+	    }
+	    userDto.setExperiences(expDto);
+	    
 	    List<SkillDto> skillDtos = new ArrayList<>();
 	    for (Skill skill : user.getSkills()) {
 	        SkillDto dto = new SkillDto();
@@ -225,7 +237,7 @@ public class UserServiceImpl implements UserService {
 	    // 🔽 Save image file
 	    if (file != null && !file.isEmpty()) {
 	        try {
-	            String uploadDir = "uploads/";
+	            String uploadDir = "uploadsProfile/";
 	            File dir = new File(uploadDir);
 	            if (!dir.exists()) dir.mkdirs();
 

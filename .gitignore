@@ -1,33 +1,11 @@
+<<<<<<< Updated upstream
 # Ignore application.properties
 src/main/resources/application.properties
 # Maven target directory
 target/
+=======
+uploadsProfile/
+>>>>>>> Stashed changes
 
-# Logs
-*.log
+src/main/resources/application.properties
 
-# IDE-specific files
-*.iml
-.idea/
-*.ipr
-*.iws
-.vscode/
-.project
-.classpath
-.settings/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Environment and local config
-.env
-*.properties.local
-
-# Java compiled files
-*.class
-
-# Packaging outputs
-*.jar
-*.war
-*.ear
