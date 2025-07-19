@@ -55,7 +55,7 @@ public class SkillServiceImpl implements SkillService{
     }
 
 	@Override
-	public List<Skill> updateSkillByUserIdAndSkillId(Long userId, List<SkillDto> skillDtoList) {
+	public List<Skill> updateSkillByUserId(Long userId, List<SkillDto> skillDtoList) {
 	    List<Skill> existingSkills = skillRepository.findByUser_id(userId);
 
 	    if (existingSkills.size() != skillDtoList.size()) {

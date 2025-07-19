@@ -13,5 +13,5 @@ public interface ProjectService {
 	
 	void deleteProjectByUserIdAndProjectId(Long userId, Long projectId);
 	
-	Project updateProjectByUserIdAndProjectId(Long userId,Long ProjectId,ProjectDto updateProject);
+	List<Project> updateProjectByUserIdAndProjectId(Long userId,List<ProjectDto> updateProjectDto);
 }

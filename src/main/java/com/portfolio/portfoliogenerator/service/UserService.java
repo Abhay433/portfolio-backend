@@ -11,8 +11,6 @@ import com.portfolio.portfoliogenerator.model.User;
 
 public interface UserService {
 	
-	User saveUserProfile(UserDto userDto);
-	
 	List<User> getAllUser(UserDto userDto);
 	
 	public User updateUserById(Long id ,UserDto userdto);

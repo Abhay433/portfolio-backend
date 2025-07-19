@@ -65,33 +65,30 @@ public class EducationServiceImpl implements EducationService {
 	}
 	
 	@Override
-	public Education updateEducationByUserId(Long userId, Long educationId, EducationDto updatedEducationDto) {
-	    Education existingEdu = educationRepository.findById(educationId)
-	        .orElseThrow(() -> new RuntimeException("Education not found"));
+	public List<Education> updateEducationByUserId(Long userId, List<EducationDto> updatedEducationDtoList) {
+	    List<Education> existingEducations = educationRepository.findByUser_Id(userId);
 
-	    if (!existingEdu.getUser().getId().equals(userId)) {
-	        throw new RuntimeException("This education record does not belong to the user");
+	    if (existingEducations.isEmpty()) {
+	        throw new RuntimeException("No education records found for user ID: " + userId);
 	    }
 
-	    if (updatedEducationDto.getDegree() != null) {
-	        existingEdu.setDegree(updatedEducationDto.getDegree());
+	    if (existingEducations.size() != updatedEducationDtoList.size()) {
+	        throw new RuntimeException("Mismatch between existing and incoming education record count");
 	    }
 
-	    if (updatedEducationDto.getInstitution() != null) {
-	        existingEdu.setInstitution(updatedEducationDto.getInstitution());
+	    for (int i = 0; i < existingEducations.size(); i++) {
+	        Education education = existingEducations.get(i);
+	        EducationDto dto = updatedEducationDtoList.get(i);
+
+	        if (dto.getDegree() != null) education.setDegree(dto.getDegree());
+	        if (dto.getInstitution() != null) education.setInstitution(dto.getInstitution());
+	        if (dto.getStartYear() != null) education.setStartYear(dto.getStartYear());
+	        if (dto.getEndYear() != null) education.setEndYear(dto.getEndYear());
 	    }
 
-	    if (updatedEducationDto.getStartYear() != null) {
-	        existingEdu.setStartYear(updatedEducationDto.getStartYear());
-	    }
-
-	    if (updatedEducationDto.getEndYear() != null) {
-	        existingEdu.setEndYear(updatedEducationDto.getEndYear());
-	    }
-
-	    educationRepository.save(existingEdu);
-	    return existingEdu;
+	    return educationRepository.saveAll(existingEducations);
 	}
+
 }
 
 

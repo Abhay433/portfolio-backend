@@ -13,6 +13,6 @@ public interface ExperienceService {
 	
 	public void deleteExperienceByUserIdAndExperienceId(Long userId, Long experienceId);
 	
-	Experience  updateExperienceByUserId(Long userId, Long experienceId, ExperienceDto updatedExperience);
+	List<Experience>  updateExperienceByUserId(Long userId, List<ExperienceDto> updatedExperience);
 
 }

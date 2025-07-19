@@ -51,14 +51,14 @@ public class ProjectController {
         }
     }
 
-    @PutMapping("/user/{userId}/project/{projectId}")
-    public ResponseEntity<Project> updateProjectByUserIdAndProjectId(
+    @PutMapping("/updateproject/{userId}")
+    public ResponseEntity <List<Project>> updateProjectByUserIdAndProjectId(
             @PathVariable Long userId,
-            @PathVariable Long projectId,
-            @RequestBody ProjectDto projectDto) {
+            @RequestBody List<ProjectDto> projectDto) {
         try {
-            Project project=projectService.updateProjectByUserIdAndProjectId(userId, projectId, projectDto);
-            return ResponseEntity.ok(project);
+           List< Project> project=projectService.updateProjectByUserIdAndProjectId(userId, projectDto);
+             ResponseEntity<List<Project>> response=ResponseEntity.ok(project);
+             return response;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

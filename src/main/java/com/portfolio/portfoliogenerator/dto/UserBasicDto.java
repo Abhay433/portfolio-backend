@@ -3,6 +3,7 @@ package com.portfolio.portfoliogenerator.dto;
 public class UserBasicDto {
 	
 
+	
 
     private String fullName;
     
@@ -54,6 +55,7 @@ public class UserBasicDto {
 		this.address = address;
 	}
     
+	
     
     
     

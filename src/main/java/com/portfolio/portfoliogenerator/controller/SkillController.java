@@ -54,7 +54,7 @@ public class SkillController {
     @PutMapping("/update/{userId}")
     public ResponseEntity<List<Skill>> updateSkill(@PathVariable Long userId, @RequestBody List< SkillDto> skillDto) {
         try {
-        	List<Skill> updatedSkill =skillService.updateSkillByUserIdAndSkillId(userId, skillDto);
+        	List<Skill> updatedSkill =skillService.updateSkillByUserId(userId, skillDto);
         	ResponseEntity<List<Skill>> response= ResponseEntity.ok(updatedSkill);
         	return response;
         } catch (Exception e) {

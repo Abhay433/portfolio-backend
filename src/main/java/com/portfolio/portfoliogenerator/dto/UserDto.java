@@ -2,12 +2,9 @@ package com.portfolio.portfoliogenerator.dto;
 
 import java.util.List;
 
-import jakarta.persistence.Column;
 
 public class UserDto {
 
-	@Column(name = "profile_image_url")
-	private String profileImageUrl;
 
 	
     private String fullName;
@@ -20,9 +17,17 @@ public class UserDto {
     
     private String address;
     
+    private String profileImageUrl;
     
 
-    private List<EducationDto> educations;
+    public String getProfileImageUrl() {
+		return profileImageUrl;
+	}
+
+	public void setProfileImageUrl(String profileImageUrl) {
+		this.profileImageUrl = profileImageUrl;
+	}
+	private List<EducationDto> educations;
     
     private List<ExperienceDto> experiences;
     
@@ -33,13 +38,6 @@ public class UserDto {
     
     
     
-	public String getProfileImageUrl() {
-		return profileImageUrl;
-	}
-
-	public void setProfileImageUrl(String profileImageUrl) {
-		this.profileImageUrl = profileImageUrl;
-	}
 
 	public String getFullName() {
 		return fullName;

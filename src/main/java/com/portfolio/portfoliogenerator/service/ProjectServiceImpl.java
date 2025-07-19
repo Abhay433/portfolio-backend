@@ -57,34 +57,31 @@ public class ProjectServiceImpl implements ProjectService{
     }
 	
 	
-	
-	public Project updateProjectByUserIdAndProjectId(Long userId, Long projectId, ProjectDto updatedProject) {
-	    Project existingProject = projectRepository.findById(projectId)
-	            .orElseThrow(() -> new RuntimeException("Project not found"));
+	@Override
+	public List<Project> updateProjectByUserIdAndProjectId(Long userId, List<ProjectDto> updatedProjectDtoList) {
+	    // Get all existing projects by user ID
+	    List<Project> existingProjects = projectRepository.findByUser_id(userId);
 
-	    if (!existingProject.getUser().getId().equals(userId)) {
-	        throw new RuntimeException("User ID mismatch with project owner");
+	    // Ensure the number of projects matches
+	    if (existingProjects.size() != updatedProjectDtoList.size()) {
+	        throw new RuntimeException("Mismatch between existing and incoming project count");
 	    }
 
-	    if (updatedProject.getTitle() != null) {
-	        existingProject.setTitle(updatedProject.getTitle());
+	    // Loop and update each project with data from its corresponding DTO
+	    for (int i = 0; i < existingProjects.size(); i++) {
+	        Project project = existingProjects.get(i);
+	        ProjectDto dto = updatedProjectDtoList.get(i);
+
+	        if (dto.getTitle() != null) project.setTitle(dto.getTitle());
+	        if (dto.getDescription() != null) project.setDescription(dto.getDescription());
+	        if (dto.getTechnologiesUsed() != null) project.setTechnologiesUsed(dto.getTechnologiesUsed());
+	        if (dto.getProjectUrl() != null) project.setProjectUrl(dto.getProjectUrl());
 	    }
 
-	    if (updatedProject.getDescription() != null) {
-	        existingProject.setDescription(updatedProject.getDescription());
-	    }
-
-	    if (updatedProject.getTechnologiesUsed() != null) {
-	        existingProject.setTechnologiesUsed(updatedProject.getTechnologiesUsed());
-	    }
-
-	    if (updatedProject.getProjectUrl() != null) {
-	        existingProject.setProjectUrl(updatedProject.getProjectUrl());
-	    }
-
-	    projectRepository.save(existingProject);
-	    return existingProject;
+	    // Save all updated projects
+	    return projectRepository.saveAll(existingProjects);
 	}
+
 
 
 }

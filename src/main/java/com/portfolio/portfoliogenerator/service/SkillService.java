@@ -14,7 +14,7 @@ public interface SkillService {
 	
 	public void deleteSkillByUserIdAndSkillId(Long userId, Long skillId);
 	
-	List<Skill> updateSkillByUserIdAndSkillId(Long userId,  List<SkillDto>  skillDto);
+	List<Skill> updateSkillByUserId(Long userId,  List<SkillDto>  skillDto);
 	
 
 }

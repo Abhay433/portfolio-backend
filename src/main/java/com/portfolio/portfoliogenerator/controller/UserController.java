@@ -22,20 +22,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/createuser")
-    public ResponseEntity<?> saveUser(@RequestBody UserDto userDto) {
-        try {
-            User savedUser = userService.saveUserProfile(userDto);
-            return ResponseEntity.ok().body(
-                new ApiResponse(true, "User profile saved successfully.", savedUser.getId())
-            );
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiResponse(false, "Error saving user profile: " + e.getMessage())
-            );
-        }
-    }
-
 
 
     @GetMapping("/users")
@@ -100,6 +86,7 @@ public class UserController {
     }
 
     
+    // to updateuser profileimage
     @PutMapping("/uploadprofile/{userId}")
     public ResponseEntity<ApiResponse> uploadProfileImage(
             @PathVariable Long userId,
@@ -112,6 +99,8 @@ public class UserController {
                     .body(new ApiResponse(false, "Failed to upload profile image: " + e.getMessage()));
         }
     }
+    
+    
     
     @PostMapping("/createuserwithimage")
     public ResponseEntity<?> saveUserWithImage(

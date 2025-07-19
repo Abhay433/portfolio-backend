@@ -51,14 +51,14 @@ public class ExperienceController {
         }
     }
 
-    @PutMapping("/user/experience/{userId}/{experienceId}")
-    public ResponseEntity<Experience> updateExperienceByUserIdAndExperienceId(
+    @PutMapping("/updateExperience/{userId}")
+    public ResponseEntity<List<Experience>> updateExperienceByUserId(
             @PathVariable Long userId,
-            @PathVariable Long experienceId,
-            @RequestBody ExperienceDto experienceDto) {
+            @RequestBody List<ExperienceDto> experienceDto) {
         try {
-        	Experience experience =experienceService.updateExperienceByUserId(userId, experienceId, experienceDto);
-            return ResponseEntity.ok(experience);
+        	List<Experience> experience = experienceService.updateExperienceByUserId(userId,experienceDto);
+            ResponseEntity <List<Experience>> response = ResponseEntity.ok(experience);
+            return response;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

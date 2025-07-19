@@ -54,21 +54,19 @@ public class EducationController {
             );
         }
     }
-
-    @PutMapping("/user/education/{userId}/{educationId}")
-    public ResponseEntity<Education> updateEducation(
+    @PutMapping("/update/education/{userId}")
+    public ResponseEntity<List<Education>> updateEducation(
         @PathVariable Long userId,
-        @PathVariable Long educationId,
-        @RequestBody EducationDto educationDto) {
-        
+        @RequestBody List<EducationDto> educationDtoList) {
+
         try {
-            Education education=educationService.updateEducationByUserId(userId, educationId, educationDto);
-            return ResponseEntity.ok(education);
+            List<Education> updatedEducations = educationService.updateEducationByUserId(userId, educationDtoList);
+            return ResponseEntity.ok(updatedEducations);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            
         }
     }
+
 
     // Inner class for consistent API responses
     public static class ApiResponse {
