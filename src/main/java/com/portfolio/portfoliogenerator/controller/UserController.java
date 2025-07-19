@@ -92,7 +92,7 @@ public class UserController {
 
     
     // to updateuser profileimage
-    @PutMapping("/uploadprofile/{userId}")
+    @PutMapping("/updateuserimage/{userId}")
     public ResponseEntity<ApiResponse> uploadProfileImage(
             @PathVariable Long userId,
             @RequestParam("image") MultipartFile imageFile) {

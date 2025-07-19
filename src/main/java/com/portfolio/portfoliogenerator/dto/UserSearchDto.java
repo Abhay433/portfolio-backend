@@ -1,6 +1,9 @@
 package com.portfolio.portfoliogenerator.dto;
 
 public class UserSearchDto {
+	
+	private Long id;
+	
 	private String fullName;
 	
 	private String eMail;
@@ -19,6 +22,14 @@ public class UserSearchDto {
 
 	public void setEmail(String eMail) {
 		this.eMail = eMail;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 	

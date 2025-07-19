@@ -1,11 +1,6 @@
-<<<<<<< Updated upstream
-# Ignore application.properties
-src/main/resources/application.properties
-# Maven target directory
-target/
-=======
-uploadsProfile/
->>>>>>> Stashed changes
 
 src/main/resources/application.properties
+
+uploadsProfile/
+
 

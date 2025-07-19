@@ -346,6 +346,7 @@ public class UserServiceImpl implements UserService {
 
 	    for (User user : users) {
 	    	UserSearchDto dto = new UserSearchDto();
+	    	dto.setId(user.getId());
 	        dto.setFullName(user.getFullName());
 	        dto.setEmail(user.getEmail());
 	        result.add(dto);

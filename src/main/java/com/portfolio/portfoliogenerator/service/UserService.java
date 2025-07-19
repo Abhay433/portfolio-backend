@@ -24,8 +24,4 @@ public interface UserService {
 	void uploadProfileImage(Long userId, MultipartFile file);
 	
 	User saveUserProfileWithImage(UserDto userDto, MultipartFile file);
-
-
-	
-	
 }
