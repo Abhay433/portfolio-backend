@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,7 @@ import com.portfolio.portfoliogenerator.dto.ProjectDto;
 import com.portfolio.portfoliogenerator.dto.SkillDto;
 import com.portfolio.portfoliogenerator.dto.UserBasicDto;
 import com.portfolio.portfoliogenerator.dto.UserDto;
+import com.portfolio.portfoliogenerator.dto.UserSearchDto;
 import com.portfolio.portfoliogenerator.model.Education;
 import com.portfolio.portfoliogenerator.model.Experience;
 import com.portfolio.portfoliogenerator.model.Project;
@@ -97,6 +99,20 @@ public class UserServiceImpl implements UserService {
 	        projectDtos.add(dto);
 	    }
 	    userDto.setProjects(projectDtos);
+	    
+	    List<ExperienceDto> experienceDto = new ArrayList<>();
+	    for (Experience exper : user.getExperiences()) {
+	        ExperienceDto dto = new ExperienceDto();
+	        dto.setJobTitle(exper.getJobTitle());
+	        dto.setCompany(exper.getCompany());
+	        dto.setStartDate(exper.getStartDate());
+	        dto.setEndDate(exper.getEndDate());
+	        dto.setDescription(exper.getDescription());
+	        
+	        experienceDto.add(dto);
+	    }
+	    userDto.setExperiences(experienceDto);
+
 
 	    return userDto;
 	}
@@ -311,19 +327,22 @@ public class UserServiceImpl implements UserService {
 	    userRepository.save(user);
 	    return user;
 	}
+
+	public List<UserSearchDto> findByFullNameOrByEmail(String fullName, String eMail) {
+	    List<User> users = userRepository.findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(fullName, eMail);
+	    List<UserSearchDto> result = new ArrayList<>();
+
+	    for (User user : users) {
+	    	UserSearchDto dto = new UserSearchDto();
+	        dto.setFullName(user.getFullName());
+	        dto.setEmail(user.getEmail());
+	        result.add(dto);
+	    }
+
+	    return result;
+	}
+
 	
-//	public void updateUserImage() {
-//		User user= new User();
-//
-//        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-//        Path filePath = Paths.get(uploadDir + fileName);
-//        Files.write(filePath, file.getBytes());
-//
-//        user.setProfileImageUrl("/" + uploadDir + fileName);
-//        
-//		user.setProfileImageUrl(user.setProfileImageUrl("/" + UPLOAD_DIR + fileName));
-//		
-//	}
 
 
 }

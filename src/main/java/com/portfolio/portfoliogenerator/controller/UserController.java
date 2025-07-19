@@ -11,8 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.portfolio.portfoliogenerator.dto.UserBasicDto;
 import com.portfolio.portfoliogenerator.dto.UserDto;
+import com.portfolio.portfoliogenerator.dto.UserSearchDto;
 import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.service.UserService;
+import com.portfolio.portfoliogenerator.service.UserServiceImpl;
 
 @RestController
 @RequestMapping("/usercontroller")
@@ -21,6 +23,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private UserServiceImpl userServiceImpl;
 
 
 
@@ -115,6 +120,22 @@ public class UserController {
                     new ApiResponse(false, "Error saving user profile: " + e.getMessage()));
         }
     }
+    
+    @GetMapping("/search")
+    public ResponseEntity<List<UserSearchDto>> findByFullNameOrByEmail(
+    	
+            @RequestParam(required = false) String fullName,
+            @RequestParam(required = false) String eMail) {
+
+        List<UserSearchDto> results = userServiceImpl.findByFullNameOrByEmail(fullName, eMail);
+
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(results);
+        }
+    }
+
 
 
     

@@ -1,7 +1,6 @@
 package com.portfolio.portfoliogenerator.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
