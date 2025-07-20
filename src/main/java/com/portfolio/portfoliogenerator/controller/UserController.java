@@ -110,7 +110,7 @@ public class UserController {
     @PostMapping("/createuserwithimage")
     public ResponseEntity<?> saveUserWithImage(
             @RequestPart("user") UserDto userDto,
-            @RequestPart("image") MultipartFile file) {
+            @RequestPart(value = "image", required = false) MultipartFile file) {
         try {
             User savedUser = userService.saveUserProfileWithImage(userDto, file);
             return ResponseEntity.ok().body(
