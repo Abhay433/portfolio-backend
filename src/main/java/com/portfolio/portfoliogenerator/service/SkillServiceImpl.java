@@ -10,9 +10,13 @@ import com.portfolio.portfoliogenerator.model.Skill;
 import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.repo.SkillRepository;
 import com.portfolio.portfoliogenerator.repo.UserRepository;
+import com.portfolio.portfoliogenerator.util.Capitalizer;
 
 @Service
 public class SkillServiceImpl implements SkillService{
+	
+	@Autowired
+	Capitalizer capitalizer;
 	
 	@Autowired
 	SkillRepository skillRepository;
@@ -35,7 +39,7 @@ public class SkillServiceImpl implements SkillService{
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
         Skill skill = new Skill();
-        skill.setName(skillDto.getName());
+        skill.setName(capitalizer.capitalise(skillDto.getName()));
         skill.setLevel(skillDto.getLevel());
         skill.setUser(user); // 👈 Set the user
 

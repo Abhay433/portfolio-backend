@@ -25,11 +25,15 @@ import com.portfolio.portfoliogenerator.model.Project;
 import com.portfolio.portfoliogenerator.model.Skill;
 import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.repo.UserRepository;
+import com.portfolio.portfoliogenerator.util.Capitalizer;
 
 
 
 @Service
 public class UserServiceImpl implements UserService {
+	
+	@Autowired
+	Capitalizer capitalizer;
 
 	@Autowired
 	UserRepository userRepository;
@@ -136,18 +140,18 @@ public class UserServiceImpl implements UserService {
 	        .orElseThrow(() -> new RuntimeException("User not found by id: " + id));
 
 	    // Update basic fields
-	    existingUser.setFullName(userDto.getFullName());
+	    existingUser.setFullName(capitalizer.capitalise(userDto.getFullName()));
 	    existingUser.setEmail(userDto.getEmail());
 	    existingUser.setPhone(userDto.getPhone());
-	    existingUser.setAboutMe(userDto.getAboutMe());
-	    existingUser.setAddress(userDto.getAddress());
+	    existingUser.setAboutMe(capitalizer.capitalise(userDto.getAboutMe()));
+	    existingUser.setAddress(capitalizer.capitalise(userDto.getAddress()));
 
 	    // Clear and update educations
 	    List<Education> educationList = new ArrayList<>();
 	    for (EducationDto eduDto : userDto.getEducations()) {
 	        Education edu = new Education();
-	        edu.setDegree(eduDto.getDegree());
-	        edu.setInstitution(eduDto.getInstitution());
+	        edu.setDegree(capitalizer.capitalise(eduDto.getDegree()));
+	        edu.setInstitution(capitalizer.capitalise(eduDto.getInstitution()));
 	        edu.setStartYear(eduDto.getStartYear());
 	        edu.setEndYear(eduDto.getEndYear());
 	        edu.setUser(existingUser);
@@ -159,11 +163,11 @@ public class UserServiceImpl implements UserService {
 	    List<Experience> experienceList = new ArrayList<>();
 	    for (ExperienceDto expDto : userDto.getExperiences()) {
 	        Experience exp = new Experience();
-	        exp.setJobTitle(expDto.getJobTitle());
-	        exp.setCompany(expDto.getCompany());
+	        exp.setJobTitle(capitalizer.capitalise(expDto.getJobTitle()));
+	        exp.setCompany(capitalizer.capitalise(expDto.getCompany()));
 	        exp.setStartDate(expDto.getStartDate());
 	        exp.setEndDate(expDto.getEndDate());
-	        exp.setDescription(expDto.getDescription());
+	        exp.setDescription(capitalizer.capitalise(expDto.getDescription()));
 	        exp.setUser(existingUser);
 	        experienceList.add(exp);
 	    }
@@ -173,8 +177,8 @@ public class UserServiceImpl implements UserService {
 	    List<Skill> skillList = new ArrayList<>();
 	    for (SkillDto skillDto : userDto.getSkills()) {
 	        Skill skill = new Skill();
-	        skill.setName(skillDto.getName());
-	        skill.setLevel(skillDto.getLevel());
+	        skill.setName(capitalizer.capitalise(skillDto.getName()));
+	        skill.setLevel(capitalizer.capitalise(skillDto.getLevel()));
 	        skill.setUser(existingUser);
 	        skillList.add(skill);
 	    }
@@ -184,9 +188,9 @@ public class UserServiceImpl implements UserService {
 	    List<Project> projectList = new ArrayList<>();
 	    for (ProjectDto projDto : userDto.getProjects()) {
 	        Project proj = new Project();
-	        proj.setTitle(projDto.getTitle());
-	        proj.setDescription(projDto.getDescription());
-	        proj.setTechnologiesUsed(projDto.getTechnologiesUsed());
+	        proj.setTitle(capitalizer.capitalise(projDto.getTitle()));
+	        proj.setDescription(capitalizer.capitalise(projDto.getDescription()));
+	        proj.setTechnologiesUsed(capitalizer.capitalise(projDto.getTechnologiesUsed()));
 	        proj.setProjectUrl(projDto.getProjectUrl());
 	        proj.setUser(existingUser);
 	        projectList.add(proj);
@@ -228,11 +232,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User saveUserProfileWithImage(UserDto userDto, MultipartFile file) {
 	    User user = new User();
-	    user.setFullName(userDto.getFullName());
-	    user.setEmail(userDto.getEmail());
+	    user.setFullName(capitalizer.capitalise(userDto.getFullName()));
+	    user.setEmail(capitalizer.capitalise(userDto.getEmail()));
 	    user.setPhone(userDto.getPhone());
-	    user.setAboutMe(userDto.getAboutMe());
-	    user.setAddress(userDto.getAddress());
+	    user.setAboutMe(capitalizer.capitalise(userDto.getAboutMe()));
+	    user.setAddress(capitalizer.capitalise(userDto.getAddress()));
 
 	    // 🔽 Save image file
 	    if (file != null && !file.isEmpty()) {
@@ -256,8 +260,8 @@ public class UserServiceImpl implements UserService {
 	    	List<Education> educationList = new ArrayList<>();
 		    for (EducationDto eduDto : userDto.getEducations()) {
 		        Education edu = new Education();
-		        edu.setDegree(eduDto.getDegree());
-		        edu.setInstitution(eduDto.getInstitution());
+		        edu.setDegree(capitalizer.capitalise(eduDto.getDegree()));
+		        edu.setInstitution(capitalizer.capitalise(eduDto.getInstitution()));
 		        edu.setStartYear(eduDto.getStartYear());
 		        edu.setEndYear(eduDto.getEndYear());
 		        edu.setUser(user);
@@ -271,11 +275,11 @@ public class UserServiceImpl implements UserService {
 	    	List<Experience> experienceList = new ArrayList<>();
 		    for (ExperienceDto expDto : userDto.getExperiences()) {
 		        Experience exp = new Experience();
-		        exp.setJobTitle(expDto.getJobTitle());
-		        exp.setCompany(expDto.getCompany());
+		        exp.setJobTitle(capitalizer.capitalise(expDto.getJobTitle()));
+		        exp.setCompany(capitalizer.capitalise(expDto.getCompany()));
 		        exp.setStartDate(expDto.getStartDate());
 		        exp.setEndDate(expDto.getEndDate());
-		        exp.setDescription(expDto.getDescription());
+		        exp.setDescription(capitalizer.capitalise(expDto.getDescription()));
 		        exp.setUser(user);
 		        experienceList.add(exp);
 		    }
@@ -288,8 +292,8 @@ public class UserServiceImpl implements UserService {
 	    	List<Skill> skillList = new ArrayList<>();
 		    for (SkillDto skillDto : userDto.getSkills()) {
 		        Skill skill = new Skill();
-		        skill.setName(skillDto.getName());
-		        skill.setLevel(skillDto.getLevel());
+		        skill.setName(capitalizer.capitalise(skillDto.getName()));
+		        skill.setLevel(capitalizer.capitalise(skillDto.getLevel()));
 		        skill.setUser(user);
 		        skillList.add(skill);
 		    }
@@ -302,9 +306,9 @@ public class UserServiceImpl implements UserService {
 	    	List<Project> projectList = new ArrayList<>();
 		    for (ProjectDto projDto : userDto.getProjects()) {
 		        Project proj = new Project();
-		        proj.setTitle(projDto.getTitle());
-		        proj.setDescription(projDto.getDescription());
-		        proj.setTechnologiesUsed(projDto.getTechnologiesUsed());
+		        proj.setTitle(capitalizer.capitalise(projDto.getTitle()));
+		        proj.setDescription(capitalizer.capitalise(projDto.getDescription()));
+		        proj.setTechnologiesUsed(capitalizer.capitalise(projDto.getTechnologiesUsed()));
 		        proj.setProjectUrl(projDto.getProjectUrl());
 		        proj.setUser(user);
 		        projectList.add(proj);
