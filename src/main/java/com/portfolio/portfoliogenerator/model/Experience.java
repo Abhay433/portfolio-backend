@@ -12,9 +12,12 @@ public class Experience {
     private Long id;
 
     private String jobTitle;
+    
     private String company;
-    private Integer startDate;
-    private Integer endDate;
+    
+    private String startDate;
+    
+    private String endDate;
 
     private String description;
 
@@ -47,19 +50,19 @@ public class Experience {
 		this.company = company;
 	}
 
-	public Integer getStartDate() {
+	public String getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(Integer startDate) {
+	public void setStartDate(String startDate) {
 		this.startDate = startDate;
 	}
 
-	public Integer getEndDate() {
+	public String getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(Integer endDate) {
+	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
 

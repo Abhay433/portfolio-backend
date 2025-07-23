@@ -56,6 +56,7 @@ public class ExperienceController {
             @PathVariable Long userId,
             @RequestBody List<ExperienceDto> experienceDto) {
         try {
+        	System.out.println(experienceDto);
         	List<Experience> experience = experienceService.updateExperienceByUserId(userId,experienceDto);
             ResponseEntity <List<Experience>> response = ResponseEntity.ok(experience);
             return response;

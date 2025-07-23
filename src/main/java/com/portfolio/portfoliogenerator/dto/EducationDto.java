@@ -9,9 +9,9 @@ public class EducationDto {
     
     private String institution;
     
-    private Integer startYear;
+    private String startYear;
     
-    private Integer endYear;
+    private String endYear;
     
 	public String getDegree() {
 		return degree;
@@ -25,16 +25,16 @@ public class EducationDto {
 	public void setInstitution(String institution) {
 		this.institution = institution;
 	}
-	public Integer getStartYear() {
+	public String getStartYear() {
 		return startYear;
 	}
-	public void setStartYear(Integer startYear) {
+	public void setStartYear(String startYear) {
 		this.startYear = startYear;
 	}
-	public Integer getEndYear() {
+	public String getEndYear() {
 		return endYear;
 	}
-	public void setEndYear(Integer endYear) {
+	public void setEndYear(String endYear) {
 		this.endYear = endYear;
 	}
 	@Override

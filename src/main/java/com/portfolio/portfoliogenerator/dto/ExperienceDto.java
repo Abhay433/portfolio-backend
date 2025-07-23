@@ -2,10 +2,18 @@ package com.portfolio.portfoliogenerator.dto;
 
 
 public class ExperienceDto {
-    private String jobTitle;
+    @Override
+	public String toString() {
+		return "ExperienceDto [jobTitle=" + jobTitle + ", company=" + company + ", startDate=" + startDate
+				+ ", endDate=" + endDate + ", description=" + description + ", getJobTitle()=" + getJobTitle()
+				+ ", getCompany()=" + getCompany() + ", getStartDate()=" + getStartDate() + ", getEndDate()="
+				+ getEndDate() + ", getDescription()=" + getDescription() + ", getClass()=" + getClass()
+				+ ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
+	}
+	private String jobTitle;
     private String company;
-    private Integer startDate;
-    private Integer endDate;
+    private String startDate;
+    private String endDate;
     private String description;
 	public String getJobTitle() {
 		return jobTitle;
@@ -19,16 +27,16 @@ public class ExperienceDto {
 	public void setCompany(String company) {
 		this.company = company;
 	}
-	public Integer getStartDate() {
+	public String getStartDate() {
 		return startDate;
 	}
-	public void setStartDate(Integer startDate) {
+	public void setStartDate(String startDate) {
 		this.startDate = startDate;
 	}
-	public Integer getEndDate() {
+	public String getEndDate() {
 		return endDate;
 	}
-	public void setEndDate(Integer endDate) {
+	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
 	public String getDescription() {
