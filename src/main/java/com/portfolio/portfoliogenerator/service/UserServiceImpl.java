@@ -232,94 +232,93 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User saveUserProfileWithImage(UserDto userDto, MultipartFile file) {
 	    User user = new User();
-	    user.setFullName(capitalizer.capitalise(userDto.getFullName()));
-	    user.setEmail(capitalizer.capitalise(userDto.getEmail()));
-	    user.setPhone(userDto.getPhone());
-	    user.setAboutMe(capitalizer.capitalise(userDto.getAboutMe()));
-	    user.setAddress(capitalizer.capitalise(userDto.getAddress()));
-
-	    // 🔽 Save image file
+	
+	    // BASIC INFO with null checks
+	    if (userDto.getFullName() != null) user.setFullName(capitalizer.capitalise(userDto.getFullName()));
+	    if (userDto.getEmail() != null) user.setEmail(capitalizer.capitalise(userDto.getEmail()));
+	    if (userDto.getPhone() != null) user.setPhone(userDto.getPhone());
+	    if (userDto.getAboutMe() != null) user.setAboutMe(capitalizer.capitalise(userDto.getAboutMe()));
+	    if (userDto.getAddress() != null) user.setAddress(capitalizer.capitalise(userDto.getAddress()));
+	
+	    // Image upload
 	    if (file != null && !file.isEmpty()) {
 	        try {
 	            String uploadDir = "uploadsProfile/";
 	            File dir = new File(uploadDir);
 	            if (!dir.exists()) dir.mkdirs();
-
+	
 	            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
 	            Path filePath = Paths.get(uploadDir + fileName);
 	            Files.write(filePath, file.getBytes());
-
+	
 	            user.setProfileImageUrl("/" + uploadDir + fileName);
 	        } catch (IOException e) {
 	            throw new RuntimeException("Failed to save image: " + e.getMessage());
 	        }
 	    }
-
-	    // EDUCATION
+	
+	    // EDUCATIONS with null checks
 	    if (userDto.getEducations() != null && !userDto.getEducations().isEmpty()) {
-	    	List<Education> educationList = new ArrayList<>();
-		    for (EducationDto eduDto : userDto.getEducations()) {
-		        Education edu = new Education();
-		        edu.setDegree(capitalizer.capitalise(eduDto.getDegree()));
-		        edu.setInstitution(capitalizer.capitalise(eduDto.getInstitution()));
-		        edu.setStartYear(eduDto.getStartYear());
-		        edu.setEndYear(eduDto.getEndYear());
-		        edu.setUser(user);
-		        educationList.add(edu);
-		    }
-		    user.setEducations(educationList);
+	        List<Education> educationList = new ArrayList<>();
+	        for (EducationDto eduDto : userDto.getEducations()) {
+	            Education edu = new Education();
+	            if (eduDto.getDegree() != null) edu.setDegree(capitalizer.capitalise(eduDto.getDegree()));
+	            if (eduDto.getInstitution() != null) edu.setInstitution(capitalizer.capitalise(eduDto.getInstitution()));
+	            if (eduDto.getStartYear() != null) edu.setStartYear(eduDto.getStartYear());
+	            if (eduDto.getEndYear() != null) edu.setEndYear(eduDto.getEndYear());
+	            edu.setUser(user);
+	            educationList.add(edu);
+	        }
+	        user.setEducations(educationList);
 	    }
-
-	    // EXPERIENCE
+	
+	    // EXPERIENCES with null checks
 	    if (userDto.getExperiences() != null && !userDto.getExperiences().isEmpty()) {
-	    	List<Experience> experienceList = new ArrayList<>();
-		    for (ExperienceDto expDto : userDto.getExperiences()) {
-		        Experience exp = new Experience();
-		        exp.setJobTitle(capitalizer.capitalise(expDto.getJobTitle()));
-		        exp.setCompany(capitalizer.capitalise(expDto.getCompany()));
-		        exp.setStartDate(expDto.getStartDate());
-		        exp.setEndDate(expDto.getEndDate());
-		        exp.setDescription(capitalizer.capitalise(expDto.getDescription()));
-		        exp.setUser(user);
-		        experienceList.add(exp);
-		    }
-		    user.setExperiences(experienceList);
+	        List<Experience> experienceList = new ArrayList<>();
+	        for (ExperienceDto expDto : userDto.getExperiences()) {
+	            Experience exp = new Experience();
+	            if (expDto.getJobTitle() != null) exp.setJobTitle(capitalizer.capitalise(expDto.getJobTitle()));
+	            if (expDto.getCompany() != null) exp.setCompany(capitalizer.capitalise(expDto.getCompany()));
+	            if (expDto.getStartDate() != null) exp.setStartDate(expDto.getStartDate());
+	            if (expDto.getEndDate() != null) exp.setEndDate(expDto.getEndDate());
+	            if (expDto.getDescription() != null) exp.setDescription(capitalizer.capitalise(expDto.getDescription()));
+	            exp.setUser(user);
+	            experienceList.add(exp);
+	        }
+	        user.setExperiences(experienceList);
 	    }
-	    
-
-	    // SKILLS
+	
+	    // SKILLS with null checks
 	    if (userDto.getSkills() != null && !userDto.getSkills().isEmpty()) {
-	    	List<Skill> skillList = new ArrayList<>();
-		    for (SkillDto skillDto : userDto.getSkills()) {
-		        Skill skill = new Skill();
-		        skill.setName(capitalizer.capitalise(skillDto.getName()));
-		        skill.setLevel(capitalizer.capitalise(skillDto.getLevel()));
-		        skill.setUser(user);
-		        skillList.add(skill);
-		    }
-		    user.setSkills(skillList);
+	        List<Skill> skillList = new ArrayList<>();
+	        for (SkillDto skillDto : userDto.getSkills()) {
+	            Skill skill = new Skill();
+	            if (skillDto.getName() != null) skill.setName(capitalizer.capitalise(skillDto.getName()));
+	            if (skillDto.getLevel() != null) skill.setLevel(capitalizer.capitalise(skillDto.getLevel()));
+	            skill.setUser(user);
+	            skillList.add(skill);
+	        }
+	        user.setSkills(skillList);
 	    }
-	    
-
-	    // PROJECTS
+	
+	    // PROJECTS with null checks
 	    if (userDto.getProjects() != null && !userDto.getProjects().isEmpty()) {
-	    	List<Project> projectList = new ArrayList<>();
-		    for (ProjectDto projDto : userDto.getProjects()) {
-		        Project proj = new Project();
-		        proj.setTitle(capitalizer.capitalise(projDto.getTitle()));
-		        proj.setDescription(capitalizer.capitalise(projDto.getDescription()));
-		        proj.setTechnologiesUsed(capitalizer.capitalise(projDto.getTechnologiesUsed()));
-		        proj.setProjectUrl(projDto.getProjectUrl());
-		        proj.setUser(user);
-		        projectList.add(proj);
-		    }
-		    user.setProjects(projectList);
+	        List<Project> projectList = new ArrayList<>();
+	        for (ProjectDto projDto : userDto.getProjects()) {
+	            Project proj = new Project();
+	            if (projDto.getTitle() != null) proj.setTitle(capitalizer.capitalise(projDto.getTitle()));
+	            if (projDto.getDescription() != null) proj.setDescription(capitalizer.capitalise(projDto.getDescription()));
+	            if (projDto.getTechnologiesUsed() != null) proj.setTechnologiesUsed(capitalizer.capitalise(projDto.getTechnologiesUsed()));
+	            if (projDto.getProjectUrl() != null) proj.setProjectUrl(projDto.getProjectUrl());
+	            proj.setUser(user);
+	            projectList.add(proj);
+	        }
+	        user.setProjects(projectList);
 	    }
+	
 	    return userRepository.save(user);
 	}
 
-
-	
 
 
 	@Override
@@ -330,23 +329,23 @@ public class UserServiceImpl implements UserService {
 	   
 
 	    if (userBasicDto.getFullName() != null) {
-	        user.setFullName(userBasicDto.getFullName());
+	        user.setFullName(capitalizer.capitalise(userBasicDto.getFullName()));
 	    }
 
 	    if (userBasicDto.getPhone() != null) {
-	        user.setPhone(userBasicDto.getPhone());
+	        user.setPhone(capitalizer.capitalise(userBasicDto.getPhone()));
 	    }
 
 	    if (userBasicDto.getEmail() != null) {
-	        user.setEmail(userBasicDto.getEmail());
+	        user.setEmail(capitalizer.capitalise(userBasicDto.getEmail()));
 	    }
 
 	    if (userBasicDto.getAboutMe() != null) {
-	        user.setAboutMe(userBasicDto.getAboutMe());
+	        user.setAboutMe(capitalizer.capitalise(userBasicDto.getAboutMe()));
 	    }
 
 	    if (userBasicDto.getAddress() != null) {
-	        user.setAddress(userBasicDto.getAddress());
+	        user.setAddress(capitalizer.capitalise(userBasicDto.getAddress()));
 	    }
 
 	    userRepository.save(user);

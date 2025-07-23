@@ -10,9 +10,13 @@ import com.portfolio.portfoliogenerator.model.Project;
 import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.repo.ProjectRepository;
 import com.portfolio.portfoliogenerator.repo.UserRepository;
+import com.portfolio.portfoliogenerator.util.Capitalizer;
 
 @Service
 public class ProjectServiceImpl implements ProjectService{
+	
+	@Autowired
+	Capitalizer capitalize;
 	
 	@Autowired
 	ProjectRepository projectRepository;
@@ -35,9 +39,9 @@ public class ProjectServiceImpl implements ProjectService{
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
         Project project = new Project();
-        project.setTitle(projectDto.getTitle());
-        project.setDescription(projectDto.getDescription());
-        project.setTechnologiesUsed(projectDto.getTechnologiesUsed());
+        project.setTitle( capitalize.capitalise(projectDto.getTitle()));
+        project.setDescription(capitalize.capitalise(projectDto.getDescription()));
+        project.setTechnologiesUsed(capitalize.capitalise(projectDto.getTechnologiesUsed()));
         project.setProjectUrl(projectDto.getProjectUrl());
         project.setUser(user); // Linking user
 
@@ -72,9 +76,9 @@ public class ProjectServiceImpl implements ProjectService{
 	        Project project = existingProjects.get(i);
 	        ProjectDto dto = updatedProjectDtoList.get(i);
 
-	        if (dto.getTitle() != null) project.setTitle(dto.getTitle());
-	        if (dto.getDescription() != null) project.setDescription(dto.getDescription());
-	        if (dto.getTechnologiesUsed() != null) project.setTechnologiesUsed(dto.getTechnologiesUsed());
+	        if (dto.getTitle() != null) project.setTitle(capitalize.capitalise(dto.getTitle()));
+	        if (dto.getDescription() != null) project.setDescription(capitalize.capitalise(dto.getDescription()));
+	        if (dto.getTechnologiesUsed() != null) project.setTechnologiesUsed(capitalize.capitalise(dto.getTechnologiesUsed()));
 	        if (dto.getProjectUrl() != null) project.setProjectUrl(dto.getProjectUrl());
 	    }
 

@@ -10,9 +10,13 @@ import com.portfolio.portfoliogenerator.model.Education;
 import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.repo.EducationRepository;
 import com.portfolio.portfoliogenerator.repo.UserRepository;
+import com.portfolio.portfoliogenerator.util.Capitalizer;
 
 @Service
 public class EducationServiceImpl implements EducationService {
+	
+	@Autowired
+	Capitalizer capitalizer;
 
 	@Autowired
 	EducationRepository educationRepository;
@@ -37,8 +41,8 @@ public class EducationServiceImpl implements EducationService {
 
 	        // Step 2: Create Education
 	        Education edu = new Education();
-	        edu.setDegree(educationdto.getDegree());
-	        edu.setInstitution(educationdto.getInstitution());
+	        edu.setDegree(capitalizer.capitalise(educationdto.getDegree()));
+	        edu.setInstitution(capitalizer.capitalise(educationdto.getInstitution()));
 	        edu.setStartYear(educationdto.getStartYear());
 	        edu.setEndYear(educationdto.getEndYear());
 	        edu.setUser(user);
@@ -80,8 +84,8 @@ public class EducationServiceImpl implements EducationService {
 	        Education education = existingEducations.get(i);
 	        EducationDto dto = updatedEducationDtoList.get(i);
 
-	        if (dto.getDegree() != null) education.setDegree(dto.getDegree());
-	        if (dto.getInstitution() != null) education.setInstitution(dto.getInstitution());
+	        if (dto.getDegree() != null) education.setDegree(capitalizer.capitalise(dto.getDegree()));
+	        if (dto.getInstitution() != null) education.setInstitution(capitalizer.capitalise(dto.getInstitution()));
 	        if (dto.getStartYear() != null) education.setStartYear(dto.getStartYear());
 	        if (dto.getEndYear() != null) education.setEndYear(dto.getEndYear());
 	    }

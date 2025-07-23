@@ -40,7 +40,7 @@ public class SkillServiceImpl implements SkillService{
 
         Skill skill = new Skill();
         skill.setName(capitalizer.capitalise(skillDto.getName()));
-        skill.setLevel(skillDto.getLevel());
+        skill.setLevel(capitalizer.capitalise(skillDto.getLevel()));
         skill.setUser(user); // 👈 Set the user
 
         skillRepository.save(skill);
@@ -70,8 +70,8 @@ public class SkillServiceImpl implements SkillService{
 	        Skill skill = existingSkills.get(i);
 	        SkillDto dto = skillDtoList.get(i);
 
-	        if (dto.getName() != null) skill.setName(dto.getName());
-	        if (dto.getLevel() != null) skill.setLevel(dto.getLevel());
+	        if (dto.getName() != null) skill.setName(capitalizer.capitalise(dto.getName()));
+	        if (dto.getLevel() != null) skill.setLevel(capitalizer.capitalise(dto.getLevel()));
 	    }
 
 	    return skillRepository.saveAll(existingSkills);

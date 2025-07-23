@@ -10,11 +10,14 @@ import com.portfolio.portfoliogenerator.model.Experience;
 import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.repo.ExperienceRepository;
 import com.portfolio.portfoliogenerator.repo.UserRepository;
+import com.portfolio.portfoliogenerator.util.Capitalizer;
 
 
 
 @Service
 public class ExperienceServiceImpl implements ExperienceService {
+	@Autowired
+	Capitalizer capitalizer;
 	
 	@Autowired
 	ExperienceRepository experienceRepository;
@@ -38,11 +41,11 @@ public class ExperienceServiceImpl implements ExperienceService {
 
         Experience exp = new Experience();
         
-        exp.setJobTitle(experienceDto.getJobTitle());
-        exp.setCompany(experienceDto.getCompany());
+        exp.setJobTitle(capitalizer.capitalise(experienceDto.getJobTitle()));
+        exp.setCompany(capitalizer.capitalise(experienceDto.getCompany()));
         exp.setStartDate(experienceDto.getStartDate());
         exp.setEndDate(experienceDto.getEndDate());
-        exp.setDescription(experienceDto.getDescription());
+        exp.setDescription(capitalizer.capitalise(experienceDto.getDescription()));
         exp.setUser(user); // 👈 Link to user
 
         experienceRepository.save(exp);
@@ -74,11 +77,11 @@ public class ExperienceServiceImpl implements ExperienceService {
 	        Experience experience = existingExperience.get(i);
 	        ExperienceDto dto = updatedExperience.get(i);
 
-	        if (dto.getJobTitle() != null) experience.setJobTitle(dto.getJobTitle());
-	        if (dto.getCompany() != null) experience.setCompany(dto.getCompany());
+	        if (dto.getJobTitle() != null) experience.setJobTitle(capitalizer.capitalise(dto.getJobTitle()));
+	        if (dto.getCompany() != null) experience.setCompany(capitalizer.capitalise(dto.getCompany()));
 	        if (dto.getStartDate() != null) experience.setStartDate(dto.getStartDate());
 	        if (dto.getEndDate() != null) experience.setEndDate(dto.getEndDate());
-	        if (dto.getDescription() != null) experience.setDescription(dto.getDescription());
+	        if (dto.getDescription() != null) experience.setDescription(capitalizer.capitalise(dto.getDescription()));
 	    }
 
 	    return experienceRepository.saveAll(existingExperience);

@@ -6,29 +6,22 @@ import org.springframework.stereotype.Component;
 public class Capitalizer {
 	
 	public String capitalise(String value) {
-		
-		String[] words = value.split("\\s");
+	    if (value == null || value.trim().isEmpty()) {
+	        return value;
+	    }
 
-        // StringBuilder to store the result
-		
-        StringBuilder result = new StringBuilder();
-        
+	    String[] words = value.trim().split("\\s+");
+	    StringBuilder result = new StringBuilder();
 
-        // iterate through each word
-        
-        for (String word : words) {
-        	
-            // capitalize the first letter, append the rest of the word, and add a space
-        	
-            result.append(Character.toTitleCase(word.charAt(0)))
-                  .append(word.substring(1))
-                  .append(" ");
-            
-        }
+	    for (String word : words) {
+	        if (!word.isEmpty()) {
+	            result.append(Character.toTitleCase(word.charAt(0)))
+	                  .append(word.substring(1).toLowerCase())
+	                  .append(" ");
+	        }
+	    }
 
-        // convert StringBuilder to String and trim leading/trailing spaces
-        
-        return result.toString().trim();
+	    return result.toString().trim();
 	}
 
 }

@@ -111,11 +111,13 @@ public class UserController {
     public ResponseEntity<?> saveUserWithImage(
             @RequestPart("user") UserDto userDto,
             @RequestPart(value = "image", required = false) MultipartFile file) {
+        System.out.println("Received user: " + userDto);  // ✅ Add this
         try {
             User savedUser = userService.saveUserProfileWithImage(userDto, file);
             return ResponseEntity.ok().body(
                     new ApiResponse(true, "User profile saved successfully with image.", savedUser.getId()));
         } catch (Exception e) {
+            e.printStackTrace(); // ✅ Print stack trace
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                     new ApiResponse(false, "Error saving user profile: " + e.getMessage()));
         }
