@@ -8,5 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ExperienceRepository extends JpaRepository<Experience, Long> {
 	
-	List<Experience> findByUser_id(Long UserId);
+	List<Experience> findByUser_Id(Long UserId);
+
+	void deleteByUser_Id(Long userId);
 }

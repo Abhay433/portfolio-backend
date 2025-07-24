@@ -146,6 +146,8 @@ public class UserServiceImpl implements UserService {
 	    existingUser.setAboutMe(capitalizer.capitalise(userDto.getAboutMe()));
 	    existingUser.setAddress(capitalizer.capitalise(userDto.getAddress()));
 
+	    
+	    
 	    // Clear and update educations
 	    List<Education> educationList = new ArrayList<>();
 	    for (EducationDto eduDto : userDto.getEducations()) {
@@ -159,6 +161,8 @@ public class UserServiceImpl implements UserService {
 	    }
 	    existingUser.setEducations(educationList);
 
+	    
+	    
 	    // Clear and update experiences
 	    List<Experience> experienceList = new ArrayList<>();
 	    for (ExperienceDto expDto : userDto.getExperiences()) {

@@ -54,6 +54,8 @@ public class EducationController {
             );
         }
     }
+    
+    
     @PutMapping("/update/education/{userId}")
     public ResponseEntity<List<Education>> updateEducation(
         @PathVariable Long userId,

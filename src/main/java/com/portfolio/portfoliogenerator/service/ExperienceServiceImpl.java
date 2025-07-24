@@ -1,5 +1,6 @@
 package com.portfolio.portfoliogenerator.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.repo.ExperienceRepository;
 import com.portfolio.portfoliogenerator.repo.UserRepository;
 import com.portfolio.portfoliogenerator.util.Capitalizer;
+import org.springframework.transaction.annotation.Transactional;
 
 
 
@@ -28,7 +30,7 @@ public class ExperienceServiceImpl implements ExperienceService {
 	
 	public List<Experience> getExperienceByUserId(Long id){
 		
-		List<Experience> experience=experienceRepository.findByUser_id(id);
+		List<Experience> experience=experienceRepository.findByUser_Id(id);
 		
 		return experience;
 		
@@ -64,27 +66,55 @@ public class ExperienceServiceImpl implements ExperienceService {
     }
 	
 	@Override
-	public List<Experience> updateExperienceByUserId(Long userId, List< ExperienceDto> updatedExperience) {
-	   List< Experience> existingExperience = experienceRepository.findByUser_id(userId);
+	@Transactional 
+	public List<Experience> updateExperienceByUserId(Long userId, List<ExperienceDto> updatedExperience) {
+	    System.out.println("🔧 Starting updateExperienceByUserId for userId: " + userId);
 
-	        
-	    if (existingExperience.size() != updatedExperience.size()) {
-	        throw new RuntimeException("Experience record does not belong to user with ID: " + userId);
+	    try {
+	        System.out.println("🧹 Deleting existing experiences for user...");
+	        experienceRepository.deleteByUser_Id(userId);
+	    } catch (Exception e) {
+	        System.out.println("❌ Failed to delete experiences: " + e.getMessage());
+	        e.printStackTrace();
+	        throw e;
 	    }
 
-	 // Update each experience
-	    for (int i = 0; i < existingExperience.size(); i++) {
-	        Experience experience = existingExperience.get(i);
-	        ExperienceDto dto = updatedExperience.get(i);
+	    List<Experience> newExperiences = new ArrayList<>();
 
-	        if (dto.getJobTitle() != null) experience.setJobTitle(capitalizer.capitalise(dto.getJobTitle()));
-	        if (dto.getCompany() != null) experience.setCompany(capitalizer.capitalise(dto.getCompany()));
-	        if (dto.getStartDate() != null) experience.setStartDate(dto.getStartDate());
-	        if (dto.getEndDate() != null) experience.setEndDate(dto.getEndDate());
-	        if (dto.getDescription() != null) experience.setDescription(capitalizer.capitalise(dto.getDescription()));
+	    for (ExperienceDto dto : updatedExperience) {
+	        try {
+	            System.out.println("📦 Processing DTO: " + dto);
+
+	            Experience experience = new Experience();
+	            experience.setJobTitle(capitalizer.capitalise(dto.getJobTitle()));
+	            experience.setCompany(capitalizer.capitalise(dto.getCompany()));
+	            experience.setStartDate(dto.getStartDate());
+	            experience.setEndDate(dto.getEndDate());
+	            experience.setDescription(capitalizer.capitalise(dto.getDescription()));
+
+	            // Get user
+	            User user = userRepository.findById(userId)
+	                    .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+	            experience.setUser(user);
+
+	            newExperiences.add(experience);
+	        } catch (Exception e) {
+	            System.out.println("❌ Error processing DTO: " + dto);
+	            e.printStackTrace();
+	            throw e;
+	        }
 	    }
 
-	    return experienceRepository.saveAll(existingExperience);
+	    try {
+	        System.out.println("💾 Saving all new experiences...");
+	        return experienceRepository.saveAll(newExperiences);
+	    } catch (Exception e) {
+	        System.out.println("❌ Failed to save experiences: " + e.getMessage());
+	        e.printStackTrace();
+	        throw e;
+	    }
 	}
+
+
 
 }
