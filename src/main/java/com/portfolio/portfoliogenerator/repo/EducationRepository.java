@@ -10,6 +10,8 @@ public interface EducationRepository extends JpaRepository<Education, Long> {
 
 	List<Education> findByUser_Id(Long userId);
 	
+	void deleteByUser_Id(Long userId);
+	
 	
 
 }

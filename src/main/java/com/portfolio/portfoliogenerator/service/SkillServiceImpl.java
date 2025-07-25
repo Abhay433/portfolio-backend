@@ -1,5 +1,6 @@
 package com.portfolio.portfoliogenerator.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.repo.SkillRepository;
 import com.portfolio.portfoliogenerator.repo.UserRepository;
 import com.portfolio.portfoliogenerator.util.Capitalizer;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class SkillServiceImpl implements SkillService{
@@ -58,22 +61,32 @@ public class SkillServiceImpl implements SkillService{
         skillRepository.deleteById(skillId);
     }
 
+	@Transactional
 	@Override
 	public List<Skill> updateSkillByUserId(Long userId, List<SkillDto> skillDtoList) {
-	    List<Skill> existingSkills = skillRepository.findByUser_id(userId);
+	    // Fetch user by ID
+	    User user = userRepository.findById(userId)
+	        .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
 
-	    if (existingSkills.size() != skillDtoList.size()) {
-	        throw new RuntimeException("Mismatch between existing and incoming skill count");
+	    // Delete old skills linked to the user
+	    skillRepository.deleteByUser_Id(userId);
+
+	    List<Skill> updatedSkills = new ArrayList<>();
+
+	    for (SkillDto dto : skillDtoList) {
+	        Skill skill = new Skill();
+
+	        // Attach the user to the skill
+	        skill.setUser(user);
+
+	        // Capitalize and set values safely
+	        skill.setName(dto.getName() != null ? capitalizer.capitalise(dto.getName()) : null);
+	        skill.setLevel(dto.getLevel() != null ? capitalizer.capitalise(dto.getLevel()) : null);
+
+	        updatedSkills.add(skill);
 	    }
 
-	    for (int i = 0; i < existingSkills.size(); i++) {
-	        Skill skill = existingSkills.get(i);
-	        SkillDto dto = skillDtoList.get(i);
-
-	        if (dto.getName() != null) skill.setName(capitalizer.capitalise(dto.getName()));
-	        if (dto.getLevel() != null) skill.setLevel(capitalizer.capitalise(dto.getLevel()));
-	    }
-
-	    return skillRepository.saveAll(existingSkills);
+	    return skillRepository.saveAll(updatedSkills);
 	}
+
 }

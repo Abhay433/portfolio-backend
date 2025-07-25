@@ -1,5 +1,6 @@
 package com.portfolio.portfoliogenerator.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.repo.ProjectRepository;
 import com.portfolio.portfoliogenerator.repo.UserRepository;
 import com.portfolio.portfoliogenerator.util.Capitalizer;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class ProjectServiceImpl implements ProjectService{
@@ -48,6 +51,7 @@ public class ProjectServiceImpl implements ProjectService{
         projectRepository.save(project);
     }
 		
+	
 	@Override
     public void deleteProjectByUserIdAndProjectId(Long userId, Long projectId) {
         Project project = projectRepository.findById(projectId)
@@ -61,30 +65,37 @@ public class ProjectServiceImpl implements ProjectService{
     }
 	
 	
+	
+	@Transactional
 	@Override
 	public List<Project> updateProjectByUserIdAndProjectId(Long userId, List<ProjectDto> updatedProjectDtoList) {
-	    // Get all existing projects by user ID
-	    List<Project> existingProjects = projectRepository.findByUser_id(userId);
+	    // Fetch user
+	    User user = userRepository.findById(userId)
+	        .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
 
-	    // Ensure the number of projects matches
-	    if (existingProjects.size() != updatedProjectDtoList.size()) {
-	        throw new RuntimeException("Mismatch between existing and incoming project count");
+	    // Delete old projects linked to this user
+	    projectRepository.deleteByUser_Id(userId);
+
+	    List<Project> updatedProjects = new ArrayList<>();
+
+	    for (ProjectDto dto : updatedProjectDtoList) {
+	        Project project = new Project();
+
+	        // Set user reference
+	        project.setUser(user);
+
+	        // Apply null-safe values
+	        project.setTitle(dto.getTitle() != null ? capitalize.capitalise(dto.getTitle()) : null);
+	        project.setDescription(dto.getDescription() != null ? capitalize.capitalise(dto.getDescription()) : null);
+	        project.setTechnologiesUsed(dto.getTechnologiesUsed() != null ? capitalize.capitalise(dto.getTechnologiesUsed()) : null);
+	        project.setProjectUrl(dto.getProjectUrl() != null ? dto.getProjectUrl() : null);
+
+	        updatedProjects.add(project);
 	    }
 
-	    // Loop and update each project with data from its corresponding DTO
-	    for (int i = 0; i < existingProjects.size(); i++) {
-	        Project project = existingProjects.get(i);
-	        ProjectDto dto = updatedProjectDtoList.get(i);
-
-	        if (dto.getTitle() != null) project.setTitle(capitalize.capitalise(dto.getTitle()));
-	        if (dto.getDescription() != null) project.setDescription(capitalize.capitalise(dto.getDescription()));
-	        if (dto.getTechnologiesUsed() != null) project.setTechnologiesUsed(capitalize.capitalise(dto.getTechnologiesUsed()));
-	        if (dto.getProjectUrl() != null) project.setProjectUrl(dto.getProjectUrl());
-	    }
-
-	    // Save all updated projects
-	    return projectRepository.saveAll(existingProjects);
+	    return projectRepository.saveAll(updatedProjects);
 	}
+
 
 
 

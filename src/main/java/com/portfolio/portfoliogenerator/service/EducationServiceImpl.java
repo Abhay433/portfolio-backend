@@ -1,6 +1,8 @@
 package com.portfolio.portfoliogenerator.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,8 @@ import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.repo.EducationRepository;
 import com.portfolio.portfoliogenerator.repo.UserRepository;
 import com.portfolio.portfoliogenerator.util.Capitalizer;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class EducationServiceImpl implements EducationService {
@@ -68,30 +72,38 @@ public class EducationServiceImpl implements EducationService {
 	    educationRepository.deleteById(educationId);
 	}
 	
+	@Transactional
 	@Override
-	public List<Education> updateEducationByUserId(Long userId, List<EducationDto> updatedEducationDtoList) {
-	    List<Education> existingEducations = educationRepository.findByUser_Id(userId);
+	public List<Education> updateEducationByUserId(Long userId, List<EducationDto> educationDtoList) {
+	    Optional<User> userOptional = userRepository.findById(userId);
+	    if (!userOptional.isPresent()) {
+	        throw new RuntimeException("User not found with ID: " + userId);
+	    }
+	    User user = userOptional.get();
 
-	    if (existingEducations.isEmpty()) {
-	        throw new RuntimeException("No education records found for user ID: " + userId);
+	    try {
+	        System.out.println("🧹 Deleting existing experiences for user...");
+	        educationRepository.deleteByUser_Id(userId);
+	    } catch (Exception e) {
+	        System.out.println("❌ Failed to delete experiences: " + e.getMessage());
+	        e.printStackTrace();
+	        throw e;
+	    }
+	    List<Education> newEducations = new ArrayList<>();
+	    for (EducationDto dto : educationDtoList) {
+	        Education edu = new Education();
+	        edu.setUser(user);
+	        edu.setDegree(capitalizer.capitalise(dto.getDegree()));
+	        edu.setInstitution(capitalizer.capitalise(dto.getInstitution()));
+	        edu.setStartYear(dto.getStartYear());
+	        edu.setEndYear(dto.getEndYear());
+	        newEducations.add(edu);
 	    }
 
-	    if (existingEducations.size() != updatedEducationDtoList.size()) {
-	        throw new RuntimeException("Mismatch between existing and incoming education record count");
-	    }
-
-	    for (int i = 0; i < existingEducations.size(); i++) {
-	        Education education = existingEducations.get(i);
-	        EducationDto dto = updatedEducationDtoList.get(i);
-
-	        if (dto.getDegree() != null) education.setDegree(capitalizer.capitalise(dto.getDegree()));
-	        if (dto.getInstitution() != null) education.setInstitution(capitalizer.capitalise(dto.getInstitution()));
-	        if (dto.getStartYear() != null) education.setStartYear(dto.getStartYear());
-	        if (dto.getEndYear() != null) education.setEndYear(dto.getEndYear());
-	    }
-
-	    return educationRepository.saveAll(existingEducations);
+	    return educationRepository.saveAll(newEducations);
 	}
+
+
 
 }
 
