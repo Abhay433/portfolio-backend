@@ -27,6 +27,8 @@ import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.repo.UserRepository;
 import com.portfolio.portfoliogenerator.util.Capitalizer;
 
+import jakarta.transaction.Transactional;
+
 
 
 @Service
@@ -133,78 +135,81 @@ public class UserServiceImpl implements UserService {
 	    return userDto;
 	}
 	
-	
+	@Transactional
 	@Override
 	public User updateUserById(Long id, UserDto userDto) {
 	    User existingUser = userRepository.findById(id)
 	        .orElseThrow(() -> new RuntimeException("User not found by id: " + id));
-
+	
 	    // Update basic fields
 	    existingUser.setFullName(capitalizer.capitalise(userDto.getFullName()));
 	    existingUser.setEmail(userDto.getEmail());
 	    existingUser.setPhone(userDto.getPhone());
 	    existingUser.setAboutMe(capitalizer.capitalise(userDto.getAboutMe()));
 	    existingUser.setAddress(capitalizer.capitalise(userDto.getAddress()));
-
-	    
-	    
-	    // Clear and update educations
-	    List<Education> educationList = new ArrayList<>();
-	    for (EducationDto eduDto : userDto.getEducations()) {
-	        Education edu = new Education();
-	        edu.setDegree(capitalizer.capitalise(eduDto.getDegree()));
-	        edu.setInstitution(capitalizer.capitalise(eduDto.getInstitution()));
-	        edu.setStartYear(eduDto.getStartYear());
-	        edu.setEndYear(eduDto.getEndYear());
-	        edu.setUser(existingUser);
-	        educationList.add(edu);
+	
+	    // Update education (if provided)
+	    if (userDto.getEducations() != null) {
+	        List<Education> educationList = new ArrayList<>();
+	        for (EducationDto eduDto : userDto.getEducations()) {
+	            Education edu = new Education();
+	            edu.setDegree(capitalizer.capitalise(eduDto.getDegree()));
+	            edu.setInstitution(capitalizer.capitalise(eduDto.getInstitution()));
+	            edu.setStartYear(eduDto.getStartYear());
+	            edu.setEndYear(eduDto.getEndYear());
+	            edu.setUser(existingUser);
+	            educationList.add(edu);
+	        }
+	        existingUser.setEducations(educationList);
 	    }
-	    existingUser.setEducations(educationList);
-
-	    
-	    
-	    // Clear and update experiences
-	    List<Experience> experienceList = new ArrayList<>();
-	    for (ExperienceDto expDto : userDto.getExperiences()) {
-	        Experience exp = new Experience();
-	        exp.setJobTitle(capitalizer.capitalise(expDto.getJobTitle()));
-	        exp.setCompany(capitalizer.capitalise(expDto.getCompany()));
-	        exp.setStartDate(expDto.getStartDate());
-	        exp.setEndDate(expDto.getEndDate());
-	        exp.setDescription(capitalizer.capitalise(expDto.getDescription()));
-	        exp.setUser(existingUser);
-	        experienceList.add(exp);
+	
+	    // Update experiences (if provided)
+	    if (userDto.getExperiences() != null) {
+	        List<Experience> experienceList = new ArrayList<>();
+	        for (ExperienceDto expDto : userDto.getExperiences()) {
+	            Experience exp = new Experience();
+	            exp.setJobTitle(capitalizer.capitalise(expDto.getJobTitle()));
+	            exp.setCompany(capitalizer.capitalise(expDto.getCompany()));
+	            exp.setStartDate(expDto.getStartDate());
+	            exp.setEndDate(expDto.getEndDate());
+	            exp.setDescription(capitalizer.capitalise(expDto.getDescription()));
+	            exp.setUser(existingUser);
+	            experienceList.add(exp);
+	        }
+	        existingUser.setExperiences(experienceList);
 	    }
-	    existingUser.setExperiences(experienceList);
-
-	    // Clear and update skills
-	    List<Skill> skillList = new ArrayList<>();
-	    for (SkillDto skillDto : userDto.getSkills()) {
-	        Skill skill = new Skill();
-	        skill.setName(capitalizer.capitalise(skillDto.getName()));
-	        skill.setLevel(capitalizer.capitalise(skillDto.getLevel()));
-	        skill.setUser(existingUser);
-	        skillList.add(skill);
+	
+	    // Update skills (if provided)
+	    if (userDto.getSkills() != null) {
+	        List<Skill> skillList = new ArrayList<>();
+	        for (SkillDto skillDto : userDto.getSkills()) {
+	            Skill skill = new Skill();
+	            skill.setName(capitalizer.capitalise(skillDto.getName()));
+	            skill.setLevel(capitalizer.capitalise(skillDto.getLevel()));
+	            skill.setUser(existingUser);
+	            skillList.add(skill);
+	        }
+	        existingUser.setSkills(skillList);
 	    }
-	    existingUser.setSkills(skillList);
-
-	    // Clear and update projects
-	    List<Project> projectList = new ArrayList<>();
-	    for (ProjectDto projDto : userDto.getProjects()) {
-	        Project proj = new Project();
-	        proj.setTitle(capitalizer.capitalise(projDto.getTitle()));
-	        proj.setDescription(capitalizer.capitalise(projDto.getDescription()));
-	        proj.setTechnologiesUsed(capitalizer.capitalise(projDto.getTechnologiesUsed()));
-	        proj.setProjectUrl(projDto.getProjectUrl());
-	        proj.setUser(existingUser);
-	        projectList.add(proj);
+	
+	    // Update projects (if provided)
+	    if (userDto.getProjects() != null) {
+	        List<Project> projectList = new ArrayList<>();
+	        for (ProjectDto projDto : userDto.getProjects()) {
+	            Project proj = new Project();
+	            proj.setTitle(capitalizer.capitalise(projDto.getTitle()));
+	            proj.setDescription(capitalizer.capitalise(projDto.getDescription()));
+	            proj.setTechnologiesUsed(capitalizer.capitalise(projDto.getTechnologiesUsed()));
+	            proj.setProjectUrl(projDto.getProjectUrl());
+	            proj.setUser(existingUser);
+	            projectList.add(proj);
+	        }
+	        existingUser.setProjects(projectList);
 	    }
-	    existingUser.setProjects(projectList);
-
-	    // Finally, save
-	    userRepository.save(existingUser);
-	    return existingUser;
+	
+	    return userRepository.save(existingUser);
 	}
+
 
 	@Override
     public void uploadProfileImage(Long userId, MultipartFile file) {
