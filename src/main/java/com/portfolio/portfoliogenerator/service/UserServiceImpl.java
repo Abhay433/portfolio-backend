@@ -71,16 +71,16 @@ public class UserServiceImpl implements UserService {
 		
 
 	    // Get current logged-in user's email
-	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-	    String currentUserEmail = auth.getName(); // usually email or username
+//	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//	    String currentUserEmail = auth.getName(); // usually email or username
 	    
 
-	    User currentUser = userRepository.findByEmail(currentUserEmail)
-	        .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
+//	    User currentUser = userRepository.findByEmail(currentUserEmail)
+//	        .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
 	    // Check if the user trying to delete is the owner of the account
-	    if (!currentUser.getId().equals(id)) {
-	        throw new AccessDeniedException("❌ You are not authorized to delete this user.");
-	    }
+//	    if (!currentUser.getId().equals(id)) {
+//	        throw new AccessDeniedException("❌ You are not authorized to delete this user.");
+//	    }
 	    
 	    if (!userRepository.existsById(id)) {
 	        throw new RuntimeException("User not found with id: " + id);
@@ -429,6 +429,9 @@ public User updateUserProfileWithImage(Long userId, UserDto userDto, MultipartFi
 
 	    return result;
 	}
+	
+
+
 
 	
 

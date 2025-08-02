@@ -16,7 +16,9 @@ public class ProfileController {
 
     @GetMapping("/has-profile/{userId}")
     public ResponseEntity<Boolean> hasProfile(@PathVariable Long userId) {
+    	
         boolean exists = profileService.doesProfileExist(userId);
+        
         return ResponseEntity.ok(exists);
     }
 }

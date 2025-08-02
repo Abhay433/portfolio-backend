@@ -23,23 +23,12 @@ public class AuthService {
 	
 	
 	public void registerUser(UserRegisterDto userRegisterDto) {
-		
-		try {
-		
-		User user = new User();
-		
-		
-		user.setEmail(userRegisterDto.getEmail());
-		user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
-		user.setFullName(capitalizer.capitalise(userRegisterDto.getFullName()));
-		
-		userRepository.save(user);
-		
-		}catch(Exception e){
-			System.out.print(e.getMessage());
-			
-		}
-		
+	    User user = new User();
+	    user.setEmail(userRegisterDto.getEmail());
+	    user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
+	    user.setFullName(capitalizer.capitalise(userRegisterDto.getFullName()));
+	    
+	    userRepository.save(user);  // Let this throw exception if email exists
 	}
 	
 

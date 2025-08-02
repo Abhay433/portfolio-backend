@@ -9,6 +9,7 @@ import com.portfolio.portfoliogenerator.repo.UserRepository;
 import com.portfolio.portfoliogenerator.security.CustomUserDetails;
 import com.portfolio.portfoliogenerator.security.CustomUserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -83,17 +84,24 @@ public class AuthController {
     
     
     
+
+
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserRegisterDto userRegisterDto) {
         try {
             authService.registerUser(userRegisterDto);
             return ResponseEntity.ok(new ApiResponse(true, "Account created successfully!"));
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ApiResponse(false, "Email already exists. Please use a different one.")
+            );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 new ApiResponse(false, "Error creating account: " + e.getMessage())
             );
         }
     }
+
     
   //Inner class for consistent API responses
     public static class ApiResponse {

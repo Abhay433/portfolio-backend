@@ -1,21 +1,19 @@
 package com.portfolio.portfoliogenerator.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import com.portfolio.portfoliogenerator.repo.EducationRepository;
 import com.portfolio.portfoliogenerator.repo.ExperienceRepository;
 import com.portfolio.portfoliogenerator.repo.ProjectRepository;
 import com.portfolio.portfoliogenerator.repo.SkillRepository;
-import com.portfolio.portfoliogenerator.repo.UserRepository;
 
 @Service
 public class ProfileServiceImpl implements ProfileService {
 	
-	@Autowired
-    private UserRepository userRepository;
 
-    @Autowired
+	@Autowired
     private EducationRepository educationRepository;
 
     @Autowired
@@ -30,6 +28,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public boolean doesProfileExist(Long userId) {
     	
+    	
         boolean hasEducation = educationRepository.existsByUser_Id(userId);
         boolean hasExperience = experienceRepository.existsByUser_Id(userId);
         boolean hasSkill = skillRepository.existsByUser_Id(userId);
@@ -37,5 +36,7 @@ public class ProfileServiceImpl implements ProfileService {
 
         return  hasEducation || hasExperience || hasSkill || hasProject;
     }
+    
+    
 }
 
