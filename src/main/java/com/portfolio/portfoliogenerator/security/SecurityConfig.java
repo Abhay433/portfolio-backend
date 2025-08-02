@@ -37,8 +37,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
                 "/skillcontroller/userskill/**",
                 "/experiencecontroller/userexperience/**",
                 "/uploadsProfile/**",
-                "/usercontroller/search",
-                "/usercontroller/delete/**"
+                "/usercontroller/search"
             ).permitAll()
             .anyRequest().authenticated()
         )
