@@ -398,7 +398,7 @@ public User updateUserProfileWithImage(Long userId, UserDto userDto, MultipartFi
 	    }
 
 	    if (userBasicDto.getEmail() != null) {
-	    	existingUser.setEmail(capitalizer.capitalise(userBasicDto.getEmail()));
+	    	existingUser.setEmail(userBasicDto.getEmail());
 	    }
 
 	    if (userBasicDto.getAboutMe() != null) {
