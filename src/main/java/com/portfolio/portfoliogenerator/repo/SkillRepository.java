@@ -11,4 +11,6 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
 	List<Skill> findByUser_id(Long id);
 	
 	void deleteByUser_Id(Long userId);
+	
+	boolean existsByUser_Id(Long userId);
 }

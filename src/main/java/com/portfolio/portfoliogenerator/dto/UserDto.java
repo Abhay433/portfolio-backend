@@ -19,8 +19,12 @@ public class UserDto {
     
     private String profileImageUrl;
     
+    
+    
 
-    public String getProfileImageUrl() {
+    
+
+	public String getProfileImageUrl() {
 		return profileImageUrl;
 	}
 

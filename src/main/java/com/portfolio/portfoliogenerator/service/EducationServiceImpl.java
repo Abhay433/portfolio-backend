@@ -2,9 +2,11 @@ package com.portfolio.portfoliogenerator.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.portfolio.portfoliogenerator.dto.EducationDto;
@@ -37,9 +39,21 @@ public class EducationServiceImpl implements EducationService {
 	
 	@Override
 	 public void  addEducation (EducationDto educationdto, Long id){
+		
+
+	    // 🔐 Get currently authenticated user's email
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    String loggedInEmail = authentication.getName();
+	    
+	   
 		 
 		User user= userRepository.findById(id)
 		 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+		
+		 // 🔒 Ensure logged-in user matches the ID provided
+	    if (!user.getEmail().equals(loggedInEmail)) {
+	        throw new AccessDeniedException("❌ You are not authorized to add education for this user.");
+	    }
 		
 		System.out.println(user);
 
@@ -62,6 +76,19 @@ public class EducationServiceImpl implements EducationService {
 	 }
 	
 	public void deleteEducationByUserIdAndEducationId(Long userId, Long educationId) {
+		
+		// 🔐 Get currently authenticated user
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    String loggedInEmail = authentication.getName();
+
+	    User loggedInUser = userRepository.findByEmail(loggedInEmail)
+	            .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
+
+	    // 🔒 Check that logged-in user is allowed to delete this education
+	    if (!loggedInUser.getId().equals(userId)) {
+	        throw new AccessDeniedException("❌ You are not authorized to delete this education.");
+	    }
+	    
 	    Education education = educationRepository.findById(educationId)
 	        .orElseThrow(() -> new RuntimeException("Education not found with ID: " + educationId));
 
@@ -74,12 +101,17 @@ public class EducationServiceImpl implements EducationService {
 	
 	@Transactional
 	@Override
-	public List<Education> updateEducationByUserId(Long userId, List<EducationDto> educationDtoList) {
-	    Optional<User> userOptional = userRepository.findById(userId);
-	    if (!userOptional.isPresent()) {
-	        throw new RuntimeException("User not found with ID: " + userId);
+	public List<Education> updateEducationByUserId(Long userId, List<EducationDto> educationDtoList) { // 🔐 Get authenticated user
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    String loggedInEmail = authentication.getName();
+
+	    User loggedInUser = userRepository.findByEmail(loggedInEmail)
+	            .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
+
+	    // 🔒 Ownership check
+	    if (!loggedInUser.getId().equals(userId)) {
+	        throw new AccessDeniedException("❌ You are not authorized to update this user's education.");
 	    }
-	    User user = userOptional.get();
 
 	    try {
 	        System.out.println("🧹 Deleting existing experiences for user...");
@@ -92,7 +124,7 @@ public class EducationServiceImpl implements EducationService {
 	    List<Education> newEducations = new ArrayList<>();
 	    for (EducationDto dto : educationDtoList) {
 	        Education edu = new Education();
-	        edu.setUser(user);
+	        edu.setUser(loggedInUser);
 	        edu.setDegree(capitalizer.capitalise(dto.getDegree()));
 	        edu.setInstitution(capitalizer.capitalise(dto.getInstitution()));
 	        edu.setStartYear(dto.getStartYear());

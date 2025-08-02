@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.portfolio.portfoliogenerator.dto.ProjectDto;
@@ -38,6 +41,20 @@ public class ProjectServiceImpl implements ProjectService{
 	
 	@Override
     public void addProject(ProjectDto projectDto, Long userId) {
+		
+		
+		 // Get current logged-in user's email from JWT token
+	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    String currentUserEmail = auth.getName();
+
+	    // Fetch logged-in user from DB
+	    User currentUser = userRepository.findByEmail(currentUserEmail)
+	        .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
+
+	    // Check if the logged-in user owns the userId being passed
+	    if (!currentUser.getId().equals(userId)) {
+	        throw new AccessDeniedException("❌ You are not authorized to add a project for another user.");
+	    }
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
@@ -56,6 +73,20 @@ public class ProjectServiceImpl implements ProjectService{
     public void deleteProjectByUserIdAndProjectId(Long userId, Long projectId) {
         Project project = projectRepository.findById(projectId)
             .orElseThrow(() -> new RuntimeException("Project not found with ID: " + projectId));
+        
+
+        // Step 1: Get currently authenticated user's email
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = auth.getName();
+
+        // Step 2: Fetch the logged-in user's details
+        User loggedInUser = userRepository.findByEmail(currentUserEmail)
+            .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
+        
+     // Step 4: Check if the project belongs to the logged-in user
+        if (!project.getUser().getId().equals(loggedInUser.getId())) {
+            throw new AccessDeniedException("❌ You are not authorized to delete this project.");
+        }
 
         if (!project.getUser().getId().equals(userId)) {
             throw new RuntimeException("This project doesn't belong to the given user.");
@@ -69,10 +100,18 @@ public class ProjectServiceImpl implements ProjectService{
 	@Transactional
 	@Override
 	public List<Project> updateProjectByUserIdAndProjectId(Long userId, List<ProjectDto> updatedProjectDtoList) {
-	    // Fetch user
-	    User user = userRepository.findById(userId)
-	        .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+		 // 🔐 Get authenticated user
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    String loggedInEmail = authentication.getName();
 
+	    // 🔐 Fetch the user from DB
+	    User loggedInUser = userRepository.findByEmail(loggedInEmail)
+	        .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
+
+	    // 🔐 Check if logged-in user matches the userId being updated
+	    if (!loggedInUser.getId().equals(userId)) {
+	        throw new AccessDeniedException("❌ You are not authorized to update projects for this user.");
+	    }
 	    // Delete old projects linked to this user
 	    projectRepository.deleteByUser_Id(userId);
 
@@ -82,7 +121,7 @@ public class ProjectServiceImpl implements ProjectService{
 	        Project project = new Project();
 
 	        // Set user reference
-	        project.setUser(user);
+	        project.setUser(loggedInUser);
 
 	        // Apply null-safe values
 	        project.setTitle(dto.getTitle() != null ? capitalize.capitalise(dto.getTitle()) : null);

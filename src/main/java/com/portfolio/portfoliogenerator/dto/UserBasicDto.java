@@ -14,6 +14,8 @@ public class UserBasicDto {
     private String aboutMe;
     
     private String address;
+    
+    
 
 	public String getFullName() {
 		return fullName;

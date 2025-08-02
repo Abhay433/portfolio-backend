@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.portfolio.portfoliogenerator.dto.SkillDto;
@@ -11,6 +12,7 @@ import com.portfolio.portfoliogenerator.model.Skill;
 import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.repo.SkillRepository;
 import com.portfolio.portfoliogenerator.repo.UserRepository;
+import com.portfolio.portfoliogenerator.security.SecurityUtil;
 import com.portfolio.portfoliogenerator.util.Capitalizer;
 
 import jakarta.transaction.Transactional;
@@ -38,8 +40,21 @@ public class SkillServiceImpl implements SkillService{
 	
 	@Override
     public void addSkill(SkillDto skillDto, Long userId) {
+
+		
         User user = userRepository.findById(userId)
+        		
+        	
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        		
+        
+
+        String loggedInEmail = SecurityUtil.getCurrentUserEmail();
+
+        // 🔐 Ensure that the logged-in user is the owner
+        if (!user.getEmail().equals(loggedInEmail)) {
+            throw new AccessDeniedException("⛔ You are not allowed to add skills to this user's portfolio.");
+        }
 
         Skill skill = new Skill();
         skill.setName(capitalizer.capitalise(skillDto.getName()));
@@ -50,16 +65,24 @@ public class SkillServiceImpl implements SkillService{
     }
 	
 	@Override
-    public void deleteSkillByUserIdAndSkillId(Long userId, Long skillId) {
-        Skill skill = skillRepository.findById(skillId)
-            .orElseThrow(() -> new RuntimeException("Skill not found with ID: " + skillId));
+	public void deleteSkillByUserIdAndSkillId(Long userId, Long skillId) {
+	    Skill skill = skillRepository.findById(skillId)
+	        .orElseThrow(() -> new RuntimeException("Skill not found with ID: " + skillId));
 
-        if (!skill.getUser().getId().equals(userId)) {
-            throw new RuntimeException("This skill doesn't belong to the given user.");
-        }
+	    // ✅ Fetch the logged-in user's email
+	    String loggedInEmail = SecurityUtil.getCurrentUserEmail();
 
-        skillRepository.deleteById(skillId);
-    }
+	    // ✅ Fetch the actual owner of the skill
+	    String skillOwnerEmail = skill.getUser().getEmail();
+
+	    // ✅ Compare
+	    if (!loggedInEmail.equals(skillOwnerEmail)) {
+	        throw new AccessDeniedException("⛔ You are not allowed to delete this skill.");
+	    }
+
+	    skillRepository.deleteById(skillId);
+	}
+
 
 	@Transactional
 	@Override
@@ -67,6 +90,14 @@ public class SkillServiceImpl implements SkillService{
 	    // Fetch user by ID
 	    User user = userRepository.findById(userId)
 	        .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+	    
+	 // ✅ Get logged-in email
+	    String loggedInEmail = SecurityUtil.getCurrentUserEmail();
+
+	    // ✅ Check if logged-in user is the owner
+	    if (!user.getEmail().equals(loggedInEmail)) {
+	        throw new AccessDeniedException("⛔ You are not allowed to edit this portfolio.");
+	    }
 
 	    // Delete old skills linked to the user
 	    skillRepository.deleteByUser_Id(userId);

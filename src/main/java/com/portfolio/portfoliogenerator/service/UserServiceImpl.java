@@ -7,8 +7,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +29,7 @@ import com.portfolio.portfoliogenerator.model.Project;
 import com.portfolio.portfoliogenerator.model.Skill;
 import com.portfolio.portfoliogenerator.model.User;
 import com.portfolio.portfoliogenerator.repo.UserRepository;
+import com.portfolio.portfoliogenerator.security.SecurityUtil;
 import com.portfolio.portfoliogenerator.util.Capitalizer;
 
 import jakarta.transaction.Transactional;
@@ -45,13 +50,38 @@ public class UserServiceImpl implements UserService {
 
 
 	@Override
-	public List<User> getAllUser(UserDto userDto) {
-		
-		return userRepository.findAll();
+	public List<UserBasicDto> getAllUsers() {
+	    return userRepository.findAll().stream()
+	        .map(user -> {
+	            UserBasicDto dto = new UserBasicDto();
+	            dto.setFullName(user.getFullName());
+	            dto.setEmail(user.getEmail());
+	            dto.setPhone(user.getPhone());
+	            dto.setAboutMe(user.getAboutMe());
+	            dto.setAddress(user.getAddress());
+	            return dto;
+	        })
+	        .collect(Collectors.toList());
 	}
+
+
 	
 	@Override
 	public void deleteUserById(Long id) {
+		
+
+	    // Get current logged-in user's email
+	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    String currentUserEmail = auth.getName(); // usually email or username
+	    
+
+	    User currentUser = userRepository.findByEmail(currentUserEmail)
+	        .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
+	    // Check if the user trying to delete is the owner of the account
+	    if (!currentUser.getId().equals(id)) {
+	        throw new AccessDeniedException("❌ You are not authorized to delete this user.");
+	    }
+	    
 	    if (!userRepository.existsById(id)) {
 	        throw new RuntimeException("User not found with id: " + id);
 	    }
@@ -140,6 +170,12 @@ public class UserServiceImpl implements UserService {
 	public User updateUserById(Long id, UserDto userDto) {
 	    User existingUser = userRepository.findById(id)
 	        .orElseThrow(() -> new RuntimeException("User not found by id: " + id));
+
+	    // ✅ Check ownership
+	    String loggedInEmail = SecurityUtil.getCurrentUserEmail();
+	    if (!existingUser.getEmail().equals(loggedInEmail)) {
+	        throw new AccessDeniedException("⛔ You are not allowed to edit this user.");
+	    }
 	
 	    // Update basic fields
 	    existingUser.setFullName(capitalizer.capitalise(userDto.getFullName()));
@@ -216,6 +252,15 @@ public class UserServiceImpl implements UserService {
         try {
             User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+            
+
+            String loggedInEmail = SecurityUtil.getCurrentUserEmail();
+            
+            // 🔐 Ownership check
+            if (!user.getEmail().equalsIgnoreCase(loggedInEmail)) {
+                throw new AccessDeniedException("⛔ You are not authorized to modify this user's profile image.");
+            }
+
 
             // Create uploads directory if not exists
             File uploadFolder = new File(UPLOAD_DIR);
@@ -239,127 +284,136 @@ public class UserServiceImpl implements UserService {
 		
 	
 	@Override
-	public User saveUserProfileWithImage(UserDto userDto, MultipartFile file) {
-	    User user = new User();
-	
-	    // BASIC INFO with null checks
-	    if (userDto.getFullName() != null) user.setFullName(capitalizer.capitalise(userDto.getFullName()));
-	    if (userDto.getEmail() != null) user.setEmail(capitalizer.capitalise(userDto.getEmail()));
-	    if (userDto.getPhone() != null) user.setPhone(userDto.getPhone());
-	    if (userDto.getAboutMe() != null) user.setAboutMe(capitalizer.capitalise(userDto.getAboutMe()));
-	    if (userDto.getAddress() != null) user.setAddress(capitalizer.capitalise(userDto.getAddress()));
-	
-	    // Image upload
-	    if (file != null && !file.isEmpty()) {
-	        try {
-	            String uploadDir = "uploadsProfile/";
-	            File dir = new File(uploadDir);
-	            if (!dir.exists()) dir.mkdirs();
-	
-	            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-	            Path filePath = Paths.get(uploadDir + fileName);
-	            Files.write(filePath, file.getBytes());
-	
-	            user.setProfileImageUrl("/" + uploadDir + fileName);
-	        } catch (IOException e) {
-	            throw new RuntimeException("Failed to save image: " + e.getMessage());
-	        }
-	    }
-	
-	    // EDUCATIONS with null checks
-	    if (userDto.getEducations() != null && !userDto.getEducations().isEmpty()) {
-	        List<Education> educationList = new ArrayList<>();
-	        for (EducationDto eduDto : userDto.getEducations()) {
-	            Education edu = new Education();
-	            if (eduDto.getDegree() != null) edu.setDegree(capitalizer.capitalise(eduDto.getDegree()));
-	            if (eduDto.getInstitution() != null) edu.setInstitution(capitalizer.capitalise(eduDto.getInstitution()));
-	            if (eduDto.getStartYear() != null) edu.setStartYear(eduDto.getStartYear());
-	            if (eduDto.getEndYear() != null) edu.setEndYear(eduDto.getEndYear());
-	            edu.setUser(user);
-	            educationList.add(edu);
-	        }
-	        user.setEducations(educationList);
-	    }
-	
-	    // EXPERIENCES with null checks
-	    if (userDto.getExperiences() != null && !userDto.getExperiences().isEmpty()) {
-	        List<Experience> experienceList = new ArrayList<>();
-	        for (ExperienceDto expDto : userDto.getExperiences()) {
-	            Experience exp = new Experience();
-	            if (expDto.getJobTitle() != null) exp.setJobTitle(capitalizer.capitalise(expDto.getJobTitle()));
-	            if (expDto.getCompany() != null) exp.setCompany(capitalizer.capitalise(expDto.getCompany()));
-	            if (expDto.getStartDate() != null) exp.setStartDate(expDto.getStartDate());
-	            if (expDto.getEndDate() != null) exp.setEndDate(expDto.getEndDate());
-	            if (expDto.getDescription() != null) exp.setDescription(capitalizer.capitalise(expDto.getDescription()));
-	            exp.setUser(user);
-	            experienceList.add(exp);
-	        }
-	        user.setExperiences(experienceList);
-	    }
-	
-	    // SKILLS with null checks
-	    if (userDto.getSkills() != null && !userDto.getSkills().isEmpty()) {
-	        List<Skill> skillList = new ArrayList<>();
-	        for (SkillDto skillDto : userDto.getSkills()) {
-	            Skill skill = new Skill();
-	            if (skillDto.getName() != null) skill.setName(capitalizer.capitalise(skillDto.getName()));
-	            if (skillDto.getLevel() != null) skill.setLevel(capitalizer.capitalise(skillDto.getLevel()));
-	            skill.setUser(user);
-	            skillList.add(skill);
-	        }
-	        user.setSkills(skillList);
-	    }
-	
-	    // PROJECTS with null checks
-	    if (userDto.getProjects() != null && !userDto.getProjects().isEmpty()) {
-	        List<Project> projectList = new ArrayList<>();
-	        for (ProjectDto projDto : userDto.getProjects()) {
-	            Project proj = new Project();
-	            if (projDto.getTitle() != null) proj.setTitle(capitalizer.capitalise(projDto.getTitle()));
-	            if (projDto.getDescription() != null) proj.setDescription(capitalizer.capitalise(projDto.getDescription()));
-	            if (projDto.getTechnologiesUsed() != null) proj.setTechnologiesUsed(capitalizer.capitalise(projDto.getTechnologiesUsed()));
-	            if (projDto.getProjectUrl() != null) proj.setProjectUrl(projDto.getProjectUrl());
-	            proj.setUser(user);
-	            projectList.add(proj);
-	        }
-	        user.setProjects(projectList);
-	    }
-	
-	    return userRepository.save(user);
-	}
+public User updateUserProfileWithImage(Long userId, UserDto userDto, MultipartFile file) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+    // BASIC INFO with null checks
+    if (userDto.getPhone() != null) user.setPhone(userDto.getPhone());
+    if (userDto.getAboutMe() != null) user.setAboutMe(capitalizer.capitalise(userDto.getAboutMe()));
+    if (userDto.getAddress() != null) user.setAddress(capitalizer.capitalise(userDto.getAddress()));
+
+    // ✅ Do NOT update email here. Use original email from login.
+
+    // IMAGE upload
+    if (file != null && !file.isEmpty()) {
+        try {
+            String uploadDir = "uploadsProfile/";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
+
+            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            Path filePath = Paths.get(uploadDir + fileName);
+            Files.write(filePath, file.getBytes());
+
+            user.setProfileImageUrl("/" + uploadDir + fileName);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save image: " + e.getMessage());
+        }
+    }
+
+    // EDUCATION
+    if (userDto.getEducations() != null && !userDto.getEducations().isEmpty()) {
+        List<Education> educationList = new ArrayList<>();
+        for (EducationDto eduDto : userDto.getEducations()) {
+            Education edu = new Education();
+            if (eduDto.getDegree() != null) edu.setDegree(capitalizer.capitalise(eduDto.getDegree()));
+            if (eduDto.getInstitution() != null) edu.setInstitution(capitalizer.capitalise(eduDto.getInstitution()));
+            if (eduDto.getStartYear() != null) edu.setStartYear(eduDto.getStartYear());
+            if (eduDto.getEndYear() != null) edu.setEndYear(eduDto.getEndYear());
+            edu.setUser(user);
+            educationList.add(edu);
+        }
+        user.setEducations(educationList);
+    }
+
+    // EXPERIENCE
+    if (userDto.getExperiences() != null && !userDto.getExperiences().isEmpty()) {
+        List<Experience> experienceList = new ArrayList<>();
+        for (ExperienceDto expDto : userDto.getExperiences()) {
+            Experience exp = new Experience();
+            if (expDto.getJobTitle() != null) exp.setJobTitle(capitalizer.capitalise(expDto.getJobTitle()));
+            if (expDto.getCompany() != null) exp.setCompany(capitalizer.capitalise(expDto.getCompany()));
+            if (expDto.getStartDate() != null) exp.setStartDate(expDto.getStartDate());
+            if (expDto.getEndDate() != null) exp.setEndDate(expDto.getEndDate());
+            if (expDto.getDescription() != null) exp.setDescription(capitalizer.capitalise(expDto.getDescription()));
+            exp.setUser(user);
+            experienceList.add(exp);
+        }
+        user.setExperiences(experienceList);
+    }
+
+    // SKILLS
+    if (userDto.getSkills() != null && !userDto.getSkills().isEmpty()) {
+        List<Skill> skillList = new ArrayList<>();
+        for (SkillDto skillDto : userDto.getSkills()) {
+            Skill skill = new Skill();
+            if (skillDto.getName() != null) skill.setName(capitalizer.capitalise(skillDto.getName()));
+            if (skillDto.getLevel() != null) skill.setLevel(capitalizer.capitalise(skillDto.getLevel()));
+            skill.setUser(user);
+            skillList.add(skill);
+        }
+        user.setSkills(skillList);
+    }
+
+    // PROJECTS
+    if (userDto.getProjects() != null && !userDto.getProjects().isEmpty()) {
+        List<Project> projectList = new ArrayList<>();
+        for (ProjectDto projDto : userDto.getProjects()) {
+            Project proj = new Project();
+            if (projDto.getTitle() != null) proj.setTitle(capitalizer.capitalise(projDto.getTitle()));
+            if (projDto.getDescription() != null) proj.setDescription(capitalizer.capitalise(projDto.getDescription()));
+            if (projDto.getTechnologiesUsed() != null) proj.setTechnologiesUsed(capitalizer.capitalise(projDto.getTechnologiesUsed()));
+            if (projDto.getProjectUrl() != null) proj.setProjectUrl(projDto.getProjectUrl());
+            proj.setUser(user);
+            projectList.add(proj);
+        }
+        user.setProjects(projectList);
+    }
+
+    return userRepository.save(user);
+}
+
 
 
 
 	@Override
 	public User updateUserBasicDetails(Long id, UserBasicDto userBasicDto) {
 
-	    User user = userRepository.findById(id)
+	    User existingUser = userRepository.findById(id)
 	        .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+	    // ✅ Check ownership
+	    String loggedInEmail = SecurityUtil.getCurrentUserEmail();
+	    if (!existingUser.getEmail().equals(loggedInEmail)) {
+	        throw new AccessDeniedException("⛔ You are not allowed to edit this user.");
+	    }
 	   
 
 	    if (userBasicDto.getFullName() != null) {
-	        user.setFullName(capitalizer.capitalise(userBasicDto.getFullName()));
+	    	existingUser.setFullName(capitalizer.capitalise(userBasicDto.getFullName()));
 	    }
 
 	    if (userBasicDto.getPhone() != null) {
-	        user.setPhone(capitalizer.capitalise(userBasicDto.getPhone()));
+	    	existingUser.setPhone(capitalizer.capitalise(userBasicDto.getPhone()));
 	    }
 
 	    if (userBasicDto.getEmail() != null) {
-	        user.setEmail(capitalizer.capitalise(userBasicDto.getEmail()));
+	    	existingUser.setEmail(capitalizer.capitalise(userBasicDto.getEmail()));
 	    }
 
 	    if (userBasicDto.getAboutMe() != null) {
-	        user.setAboutMe(capitalizer.capitalise(userBasicDto.getAboutMe()));
+	    	existingUser.setAboutMe(capitalizer.capitalise(userBasicDto.getAboutMe()));
 	    }
 
 	    if (userBasicDto.getAddress() != null) {
-	        user.setAddress(capitalizer.capitalise(userBasicDto.getAddress()));
+	    	existingUser.setAddress(capitalizer.capitalise(userBasicDto.getAddress()));
 	    }
 
-	    userRepository.save(user);
-	    return user;
+	    userRepository.save(existingUser);
+	    return existingUser;
 	}
+	
+	
 
 	public List<UserSearchDto> findByFullNameOrByEmail(String fullName, String eMail) {
 	    List<User> users = userRepository.findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(fullName, eMail);

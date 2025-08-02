@@ -11,4 +11,6 @@ public interface ExperienceRepository extends JpaRepository<Experience, Long> {
 	List<Experience> findByUser_Id(Long UserId);
 
 	void deleteByUser_Id(Long userId);
+	
+	boolean existsByUser_Id(Long userId);
 }

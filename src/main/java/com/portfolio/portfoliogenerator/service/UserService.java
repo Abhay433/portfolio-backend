@@ -11,7 +11,9 @@ import com.portfolio.portfoliogenerator.model.User;
 
 public interface UserService {
 	
-	List<User> getAllUser(UserDto userDto);
+	List<UserBasicDto> getAllUsers(); // We'll return limited fields only
+
+
 	
 	public User updateUserById(Long id ,UserDto userdto);
 
@@ -23,5 +25,7 @@ public interface UserService {
 	
 	void uploadProfileImage(Long userId, MultipartFile file);
 	
-	User saveUserProfileWithImage(UserDto userDto, MultipartFile file);
+	User updateUserProfileWithImage(Long userId,UserDto userDto, MultipartFile file);
+
+	
 }

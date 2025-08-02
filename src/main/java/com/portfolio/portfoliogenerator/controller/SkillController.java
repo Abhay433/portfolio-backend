@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import com.portfolio.portfoliogenerator.dto.SkillDto;
@@ -19,15 +20,21 @@ public class SkillController {
     private SkillService skillService;
 
     @PostMapping("/addSkill/{userId}")
-    public ResponseEntity<?> addSkill(@RequestBody SkillDto skillDto, @PathVariable Long userId) {
+    public ResponseEntity<ApiResponse> addSkill(@RequestBody SkillDto skillDto, @PathVariable Long userId) {
         try {
             skillService.addSkill(skillDto, userId);
-            return ResponseEntity.ok(new ApiResponse(true, "Skill added successfully."));
+            return ResponseEntity.ok(new ApiResponse(true, "✅ Skill added successfully."));
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                new ApiResponse(false, "⛔ " + ex.getMessage())
+            );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiResponse(false, "Error adding skill: " + e.getMessage()));
+                new ApiResponse(false, "❌ Error adding skill: " + e.getMessage())
+            );
         }
     }
+
 
     @GetMapping("/userskill/{userId}")
     public ResponseEntity<?> getSkillsByUserId(@PathVariable Long userId) {
@@ -44,12 +51,16 @@ public class SkillController {
     public ResponseEntity<?> deleteSkill(@PathVariable Long userId, @PathVariable Long skillId) {
         try {
             skillService.deleteSkillByUserIdAndSkillId(userId, skillId);
-            return ResponseEntity.ok(new ApiResponse(true, "Skill deleted successfully."));
+            return ResponseEntity.ok(new ApiResponse(true, "✅ Skill deleted successfully."));
+        } catch (AccessDeniedException ade) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ApiResponse(false, ade.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiResponse(false, "Error deleting skill: " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "❌ Error deleting skill: " + e.getMessage()));
         }
     }
+
 
     @PutMapping("/update/{userId}")
     public ResponseEntity<List<Skill>> updateSkill(@PathVariable Long userId, @RequestBody List< SkillDto> skillDto) {

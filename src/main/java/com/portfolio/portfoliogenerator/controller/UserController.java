@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,6 +14,7 @@ import com.portfolio.portfoliogenerator.dto.UserBasicDto;
 import com.portfolio.portfoliogenerator.dto.UserDto;
 import com.portfolio.portfoliogenerator.dto.UserSearchDto;
 import com.portfolio.portfoliogenerator.model.User;
+import com.portfolio.portfoliogenerator.security.CustomUserDetails;
 import com.portfolio.portfoliogenerator.service.UserService;
 import com.portfolio.portfoliogenerator.service.UserServiceImpl;
 
@@ -28,16 +30,14 @@ public class UserController {
     private UserServiceImpl userServiceImpl;
 
 
-
     @GetMapping("/users")
-    public ResponseEntity<?> getAllUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<?> getAllUsers() {
         try {
-            List<User> users = userService.getAllUser(userDto);
+            List<UserBasicDto> users = userService.getAllUsers();
             return ResponseEntity.ok(users);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiResponse(false, "Error fetching users: " + e.getMessage())
-            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse(false, "Error fetching users: " + e.getMessage()));
         }
     }
 
@@ -110,18 +110,26 @@ public class UserController {
     @PostMapping("/createuserwithimage")
     public ResponseEntity<?> saveUserWithImage(
             @RequestPart("user") UserDto userDto,
-            @RequestPart(value = "image", required = false) MultipartFile file) {
-        System.out.println("Received user: " + userDto);  // ✅ Add this
+            @RequestPart(value = "image", required = false) MultipartFile file,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        System.out.println("🔐 Logged-in user ID: " + userDetails.getId());
+
         try {
-            User savedUser = userService.saveUserProfileWithImage(userDto, file);
+            // Use logged-in user ID instead of new user
+            Long userId = userDetails.getId();
+            
+            User savedUser = userService.updateUserProfileWithImage(userId, userDto, file);
+
             return ResponseEntity.ok().body(
-                    new ApiResponse(true, "User profile saved successfully with image.", savedUser.getId()));
+                    new ApiResponse(true, "User profile updated successfully with image.", savedUser.getId()));
         } catch (Exception e) {
-            e.printStackTrace(); // ✅ Print stack trace
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new ApiResponse(false, "Error saving user profile: " + e.getMessage()));
+                    new ApiResponse(false, "Error updating user profile: " + e.getMessage()));
         }
     }
+
     
     @GetMapping("/search")
     public ResponseEntity<List<UserSearchDto>> findByFullNameOrByEmail(

@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.portfolio.portfoliogenerator.dto.ExperienceDto;
@@ -38,8 +41,19 @@ public class ExperienceServiceImpl implements ExperienceService {
 	
 	@Override
     public void addExperience(ExperienceDto experienceDto, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+		 // 🔐 Get logged-in user from SecurityContext
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    String loggedInEmail = authentication.getName();
+
+	    // 🔍 Fetch logged-in user from DB
+	    User loggedInUser = userRepository.findByEmail(loggedInEmail)
+	            .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
+
+	    // 🔒 Check if user is adding experience to their own profile
+	    if (!loggedInUser.getId().equals(userId)) {
+	        throw new AccessDeniedException("❌ You are not authorized to add experience to this user.");
+	    }
 
         Experience exp = new Experience();
         
@@ -48,18 +62,27 @@ public class ExperienceServiceImpl implements ExperienceService {
         exp.setStartDate(experienceDto.getStartDate());
         exp.setEndDate(experienceDto.getEndDate());
         exp.setDescription(capitalizer.capitalise(experienceDto.getDescription()));
-        exp.setUser(user); // 👈 Link to user
+        exp.setUser(loggedInUser); // 👈 Link to user
 
         experienceRepository.save(exp);
     }
 	
 	@Override
     public void deleteExperienceByUserIdAndExperienceId(Long userId, Long experienceId) {
+		
         Experience experience = experienceRepository.findById(experienceId)
             .orElseThrow(() -> new RuntimeException("Experience not found with ID: " + experienceId));
+        
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInEmail = authentication.getName();
 
-        if (!experience.getUser().getId().equals(userId)) {
-            throw new RuntimeException("This experience doesn't belong to the given user.");
+        User loggedInUser = userRepository.findByEmail(loggedInEmail)
+                .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
+
+
+        // 🔒 Ensure ownership: logged-in user must own the experience
+        if (!experience.getUser().getId().equals(loggedInUser.getId())) {
+            throw new AccessDeniedException("❌ You are not authorized to delete this experience.");
         }
 
         experienceRepository.deleteById(experienceId);
@@ -68,7 +91,18 @@ public class ExperienceServiceImpl implements ExperienceService {
 	@Override
 	@Transactional 
 	public List<Experience> updateExperienceByUserId(Long userId, List<ExperienceDto> updatedExperience) {
-	    System.out.println("🔧 Starting updateExperienceByUserId for userId: " + userId);
+	    
+	    // 🔐 Ownership Check - get the logged-in user's email from Security Context
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    String loggedInEmail = authentication.getName();
+
+	    User loggedInUser = userRepository.findByEmail(loggedInEmail)
+	            .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
+
+	    if (!loggedInUser.getId().equals(userId)) {
+	        throw new AccessDeniedException("❌ You are not authorized to update this user's experiences.");
+	    }
+	    
 
 	    try {
 	        System.out.println("🧹 Deleting existing experiences for user...");
