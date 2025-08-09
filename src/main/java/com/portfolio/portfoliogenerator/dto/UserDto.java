@@ -18,19 +18,7 @@ public class UserDto {
     private String address;
     
     private String profileImageUrl;
-    
-    
-    
-
-    
-
-	public String getProfileImageUrl() {
-		return profileImageUrl;
-	}
-
-	public void setProfileImageUrl(String profileImageUrl) {
-		this.profileImageUrl = profileImageUrl;
-	}
+	
 	private List<EducationDto> educations;
     
     private List<ExperienceDto> experiences;
@@ -41,7 +29,13 @@ public class UserDto {
     
     
     
-    
+    public String getProfileImageUrl() {
+		return profileImageUrl;
+	}
+
+	public void setProfileImageUrl(String profileImageUrl) {
+		this.profileImageUrl = profileImageUrl;
+	}
 
 	public String getFullName() {
 		return fullName;

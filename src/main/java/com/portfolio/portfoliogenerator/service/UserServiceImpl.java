@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -105,6 +103,7 @@ public class UserServiceImpl implements UserService {
 	    userDto.setProfileImageUrl(user.getProfileImageUrl());
 		
 	    List<EducationDto> eduDtos = new ArrayList<>();
+	    
 	    for (Education edu : user.getEducations()) {
 	        EducationDto dto = new EducationDto();
 	        dto.setDegree(edu.getDegree());
@@ -149,6 +148,7 @@ public class UserServiceImpl implements UserService {
 	    userDto.setProjects(projectDtos);
 	    
 	    List<ExperienceDto> experienceDto = new ArrayList<>();
+	    
 	    for (Experience exper : user.getExperiences()) {
 	        ExperienceDto dto = new ExperienceDto();
 	        dto.setJobTitle(exper.getJobTitle());
@@ -200,7 +200,7 @@ public class UserServiceImpl implements UserService {
 	    }
 	
 	    // Update experiences (if provided)
-	    if (userDto.getExperiences() != null) {
+	    if (userDto.getExperiences() != null ) {
 	        List<Experience> experienceList = new ArrayList<>();
 	        for (ExperienceDto expDto : userDto.getExperiences()) {
 	            Experience exp = new Experience();
